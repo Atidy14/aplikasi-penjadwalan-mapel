@@ -2,7 +2,11 @@
 
 import { prisma } from "../lib/prisma";
 import { revalidatePath } from "next/cache";
-import { generateAutomaticSchedule } from "../lib/services/autoGeneratorService";
+import {
+  generateAutomaticSchedule,
+  undoLastScheduleGeneration,
+  checkCanUndo,
+} from "../lib/services/autoGeneratorService";
 
 async function getActiveAcademicYearId() {
   let activeYear = await prisma.academicYear.findFirst({ where: { isActive: true } });
@@ -20,6 +24,22 @@ export async function runAutoGenerator() {
   
   revalidatePath("/master/classes");
   revalidatePath("/master/auto-generate");
+  revalidatePath("/master/print");
+  revalidatePath("/");
   return result;
 }
 
+export async function runUndoGenerator() {
+  const academicYearId = await getActiveAcademicYearId();
+  const result = await undoLastScheduleGeneration(academicYearId);
+
+  revalidatePath("/master/classes");
+  revalidatePath("/master/auto-generate");
+  revalidatePath("/master/print");
+  revalidatePath("/");
+  return result;
+}
+
+export async function getCanUndoStatus() {
+  return await checkCanUndo();
+}

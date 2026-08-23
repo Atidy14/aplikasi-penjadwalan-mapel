@@ -31,12 +31,41 @@ export async function generateAutomaticSchedule(academicYearId: string) {
   const newSchedules: any[] = [];
   const unassigned: any[] = [];
 
-  // 2. Hapus semua jadwal lama di tahun ajaran ini agar bersih (Fresh Generate)
+  // 2. SIMPAN BACKUP / SNAPSHOT JADWAL SEBELUMNYA (UNTUK FITUR UNDO)
+  const previousSchedules = await prisma.schedule.findMany({
+    where: { academicYearId },
+    select: {
+      academicYearId: true,
+      classGroupId: true,
+      subjectId: true,
+      teacherId: true,
+      dayOfWeek: true,
+      periodNumber: true,
+      validFrom: true,
+      validUntil: true,
+    }
+  });
+
+  if (previousSchedules.length > 0) {
+    await prisma.auditLog.create({
+      data: {
+        action: "SCHEDULE_SNAPSHOT_BACKUP",
+        details: {
+          timestamp: new Date().toISOString(),
+          totalBackedUp: previousSchedules.length,
+          schedules: previousSchedules,
+        },
+        performedBy: "Auto-Generator Backup Service"
+      }
+    });
+  }
+
+  // 3. Hapus semua jadwal lama di tahun ajaran ini agar bersih (Fresh Generate)
   await prisma.schedule.deleteMany({
     where: { academicYearId }
   });
 
-  // 3. Algoritma Greedy Sederhana
+  // 4. Algoritma Greedy Heuristic
   for (const load of teachingLoads) {
     let periodsToAssign = load.targetPeriods;
 
@@ -46,8 +75,6 @@ export async function generateAutomaticSchedule(academicYearId: string) {
 
       for (const ts of timeSettings) {
         if (periodsToAssign === 0) break;
-        // Jangan taruh mapel di jam istirahat (jam istirahat bukan period valid untuk KBM jika disetup khusus)
-        // Tapi asumsikan periodNumber 1-8 adalah jam KBM valid
 
         const teacherKey = `${load.teacherId}-${day}-${ts.periodNumber}`;
         const classKey = `${load.classGroupId}-${day}-${ts.periodNumber}`;
@@ -89,7 +116,7 @@ export async function generateAutomaticSchedule(academicYearId: string) {
     }
   }
 
-  // 4. Simpan hasil secara batch
+  // 5. Simpan hasil secara batch
   if (newSchedules.length > 0) {
     await prisma.schedule.createMany({
       data: newSchedules
@@ -112,7 +139,75 @@ export async function generateAutomaticSchedule(academicYearId: string) {
   return {
     success: true,
     generatedCount: newSchedules.length,
-    unassigned
+    unassigned,
+    canUndo: previousSchedules.length > 0,
   };
 }
 
+export async function undoLastScheduleGeneration(academicYearId: string) {
+  // Cari snapshot backup terbaru
+  const lastSnapshot = await prisma.auditLog.findFirst({
+    where: { action: "SCHEDULE_SNAPSHOT_BACKUP" },
+    orderBy: { timestamp: "desc" }
+  });
+
+  if (!lastSnapshot || !lastSnapshot.details) {
+    throw new Error("Tidak ditemukan riwayat backup jadwal sebelumnya untuk di-undo.");
+  }
+
+  const details = lastSnapshot.details as any;
+  const backupSchedules = details.schedules || [];
+
+  if (backupSchedules.length === 0) {
+    throw new Error("Data backup jadwal kosong.");
+  }
+
+  // 1. Hapus jadwal yang ada saat ini
+  await prisma.schedule.deleteMany({
+    where: { academicYearId }
+  });
+
+  // 2. Pulihkan jadwal dari backup
+  const formattedSchedules = backupSchedules.map((s: any) => ({
+    academicYearId: s.academicYearId,
+    classGroupId: s.classGroupId,
+    subjectId: s.subjectId,
+    teacherId: s.teacherId,
+    dayOfWeek: s.dayOfWeek,
+    periodNumber: s.periodNumber,
+    validFrom: s.validFrom ? new Date(s.validFrom) : new Date(),
+    validUntil: s.validUntil ? new Date(s.validUntil) : null,
+  }));
+
+  await prisma.schedule.createMany({
+    data: formattedSchedules
+  });
+
+  // 3. Catat di Audit Log
+  await prisma.auditLog.create({
+    data: {
+      action: "RESTORE_SCHEDULE_UNDO",
+      details: {
+        restoredCount: formattedSchedules.length,
+        restoredFromDate: lastSnapshot.timestamp
+      },
+      performedBy: "User via Undo Button"
+    }
+  });
+
+  // Hapus snapshot yang sudah di-restore
+  await prisma.auditLog.delete({ where: { id: lastSnapshot.id } });
+
+  return {
+    success: true,
+    restoredCount: formattedSchedules.length
+  };
+}
+
+export async function checkCanUndo() {
+  const lastSnapshot = await prisma.auditLog.findFirst({
+    where: { action: "SCHEDULE_SNAPSHOT_BACKUP" },
+    orderBy: { timestamp: "desc" }
+  });
+  return !!lastSnapshot;
+}
