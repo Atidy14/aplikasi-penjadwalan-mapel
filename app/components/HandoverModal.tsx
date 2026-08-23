@@ -6,7 +6,7 @@ import { processTeacherHandover } from "@/app/actions/handoverActions";
 type Teacher = {
   id: string;
   name: string;
-  status: "ACTIVE" | "INACTIVE";
+  status: string;
 };
 
 export default function HandoverModal({ teachers }: { teachers: Teacher[] }) {

@@ -206,7 +206,7 @@ export default function SchedulePrintView({
                     {timeSettings.map((ts) => {
                       const isBreak = ts.periodNumber === 5;
                       return (
-                        <React.Fragment key={ts.id}>
+                        <React.Fragment key={ts.periodNumber}>
                           {isBreak && (
                             <tr className="bg-slate-200 text-slate-600 font-bold">
                               <td className="border border-slate-400 py-1 text-[11px]">
@@ -342,7 +342,7 @@ export default function SchedulePrintView({
                     {timeSettings.map((ts) => {
                       const isBreak = ts.periodNumber === 5;
                       return (
-                        <React.Fragment key={ts.id}>
+                        <React.Fragment key={ts.periodNumber}>
                           {isBreak && (
                             <tr className="bg-slate-200 text-slate-600 font-bold">
                               <td className="border border-slate-400 py-1 text-[11px]">

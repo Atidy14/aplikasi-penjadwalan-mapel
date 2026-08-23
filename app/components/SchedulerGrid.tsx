@@ -158,7 +158,7 @@ export default function SchedulerGrid({
                 const isBreakTime = ts.periodNumber === 5; // Istirahat ditaruh tepat sebelum jam 5
                 
                 return (
-                  <React.Fragment key={ts.id}>
+                  <React.Fragment key={ts.periodNumber}>
                     {isBreakTime && (
                       <tr className="bg-slate-100">
                         <td className="px-4 py-2 border-r text-center font-bold text-slate-500 text-xs">ISTIRAHAT</td>

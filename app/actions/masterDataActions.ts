@@ -34,7 +34,7 @@ export async function updateTeacher(id: string, formData: FormData) {
   revalidatePath("/master/teachers");
 }
 
-export async function toggleTeacherStatus(id: string, currentStatus: "ACTIVE" | "INACTIVE") {
+export async function toggleTeacherStatus(id: string, currentStatus: string) {
   await prisma.teacher.update({
     where: { id },
     data: { status: currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE" },
