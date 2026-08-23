@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ArrowRight,
+  Info,
 } from "lucide-react";
 
 export default function GeneratorButton() {
@@ -93,36 +94,66 @@ export default function GeneratorButton() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
-          {/* Tombol Mulai Generator dengan Dialog Konfirmasi */}
-          <button
-            onClick={() => setShowConfirmModal(true)}
-            disabled={isPending || isUndoPending}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-indigo-500/25 transition disabled:opacity-50"
-          >
-            <Zap className="w-4 h-4 fill-current" />
-            {isPending ? "Sedang Menyusun Jadwal Otomatis..." : "Mulai Auto-Generate"}
-          </button>
-
-          {/* Tombol UNDO / Batalkan Jadwal Sebelumnya */}
-          {canUndo && (
+          {/* Tombol 1: Mulai Auto-Generate (dengan Hanging Tooltip) */}
+          <div className="relative group">
             <button
-              onClick={handleUndo}
+              onClick={() => setShowConfirmModal(true)}
               disabled={isPending || isUndoPending}
-              className="inline-flex items-center gap-2 px-5 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-sm rounded-xl transition shadow-xs disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md hover:shadow-indigo-500/25 transition disabled:opacity-50"
             >
-              <RotateCcw className={`w-4 h-4 ${isUndoPending ? "animate-spin" : ""}`} />
-              {isUndoPending ? "Sedang Memulihkan..." : "Undo / Pulihkan Jadwal Sebelumnya"}
+              <Zap className="w-4 h-4 fill-current" />
+              {isPending ? "Sedang Menyusun Jadwal Otomatis..." : "Mulai Auto-Generate"}
             </button>
+
+            {/* Hanging Comment Tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-40 pointer-events-none w-64 animate-in fade-in zoom-in-95">
+              <div className="bg-slate-900 text-white text-[11px] font-medium py-2 px-3 rounded-lg shadow-xl text-center leading-snug border border-slate-700">
+                ⚡ <strong>Mulai Eksekusi:</strong> Menyusun ulang jadwal seluruh kelas otomatis berdasarkan data Kertas Kerja.
+              </div>
+              <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+            </div>
+          </div>
+
+          {/* Tombol 2: UNDO (dengan Hanging Tooltip) */}
+          {canUndo && (
+            <div className="relative group">
+              <button
+                onClick={handleUndo}
+                disabled={isPending || isUndoPending}
+                className="inline-flex items-center gap-2 px-5 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-sm rounded-xl transition shadow-xs disabled:opacity-50"
+              >
+                <RotateCcw className={`w-4 h-4 ${isUndoPending ? "animate-spin" : ""}`} />
+                {isUndoPending ? "Sedang Memulihkan..." : "Undo / Pulihkan Jadwal Sebelumnya"}
+              </button>
+
+              {/* Hanging Comment Tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-40 pointer-events-none w-64 animate-in fade-in zoom-in-95">
+                <div className="bg-slate-900 text-white text-[11px] font-medium py-2 px-3 rounded-lg shadow-xl text-center leading-snug border border-slate-700">
+                  ⏪ <strong>Tombol Undo:</strong> Membatalkan generate dan mengembalikan seluruh jadwal ke kondisi sebelum tombol ditekan.
+                </div>
+                <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+              </div>
+            </div>
           )}
 
-          {/* Shortcut Cetak PDF langsung */}
-          <Link
-            href="/master/print"
-            className="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm rounded-xl transition"
-          >
-            <Printer className="w-4 h-4 text-slate-600" />
-            Cetak / Export PDF
-          </Link>
+          {/* Tombol 3: Cetak PDF Frame Atas (dengan Hanging Tooltip) */}
+          <div className="relative group">
+            <Link
+              href="/master/print"
+              className="inline-flex items-center gap-2 px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-sm rounded-xl transition"
+            >
+              <Printer className="w-4 h-4 text-slate-600" />
+              Cetak / Export PDF
+            </Link>
+
+            {/* Hanging Comment Tooltip */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-40 pointer-events-none w-64 animate-in fade-in zoom-in-95">
+              <div className="bg-slate-900 text-white text-[11px] font-medium py-2 px-3 rounded-lg shadow-xl text-center leading-snug border border-slate-700">
+                🖨️ <strong>Cetak Jadwal Aktif:</strong> Buka lembar rekapitulasi untuk mencetak jadwal yang saat ini sudah tersimpan di database.
+              </div>
+              <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -200,23 +231,48 @@ export default function GeneratorButton() {
               </div>
             </div>
 
-            {/* SHORTCUT AKSI CEPAT */}
-            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-              <Link
-                href="/master/print"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition"
-              >
-                <Printer className="w-4 h-4" />
-                Cetak / Simpan PDF
-              </Link>
-              <Link
-                href="/master/classes"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition"
-              >
-                <Calendar className="w-4 h-4" />
-                Lihat Papan Jadwal
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+            {/* SHORTCUT AKSI CEPAT DENGAN HANGING TOOLTIP */}
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+              
+              {/* Tombol Cetak Hasil Baru (Hijau) */}
+              <div className="relative group">
+                <Link
+                  href="/master/print"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition"
+                >
+                  <Printer className="w-4 h-4" />
+                  Cetak / Simpan PDF
+                </Link>
+
+                {/* Hanging Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-40 pointer-events-none w-56 animate-in fade-in zoom-in-95">
+                  <div className="bg-slate-900 text-white text-[11px] font-medium py-2 px-3 rounded-lg shadow-xl text-center leading-snug border border-slate-700">
+                    📄 <strong>Cetak Hasil Baru:</strong> Langsung cetak / simpan dokumen PDF dari jadwal yang baru saja berhasil disusun.
+                  </div>
+                  <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+                </div>
+              </div>
+
+              {/* Tombol Lihat Papan Jadwal (Hitam) */}
+              <div className="relative group">
+                <Link
+                  href="/master/classes"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md transition"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Lihat Papan Jadwal
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+
+                {/* Hanging Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:flex flex-col items-center z-40 pointer-events-none w-56 animate-in fade-in zoom-in-95">
+                  <div className="bg-slate-900 text-white text-[11px] font-medium py-2 px-3 rounded-lg shadow-xl text-center leading-snug border border-slate-700">
+                    📅 <strong>Buka Papan Kelas:</strong> Periksa grid jadwal per rombel kelas dan progress pemenuhan target jam.
+                  </div>
+                  <div className="w-2 h-2 bg-slate-900 rotate-45 -mt-1 border-r border-b border-slate-700"></div>
+                </div>
+              </div>
+
             </div>
           </div>
 
