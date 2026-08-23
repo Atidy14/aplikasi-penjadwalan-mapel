@@ -76,8 +76,10 @@ export async function processTeacherHandover(formData: FormData) {
     });
   });
 
-  revalidatePath("/master/teachers");
-  revalidatePath("/master/classes");
+  try {
+    revalidatePath("/master/teachers");
+    revalidatePath("/master/classes");
+  } catch {}
 }
 
 export async function getAuditLogs() {
