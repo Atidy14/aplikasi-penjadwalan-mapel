@@ -10,12 +10,18 @@ export default function MasterLayout({
       {/* Top Navbar */}
       <header className="bg-slate-900 text-white shadow-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="bg-blue-600 text-white font-bold p-1.5 rounded-lg text-sm">📅 APM</span>
-            <span className="font-bold text-lg tracking-tight">Aplikasi Penjadwalan Mapel</span>
-          </div>
+          <Link href="/" className="flex items-center gap-3 group">
+            <span className="bg-emerald-600 group-hover:bg-emerald-500 text-white font-bold p-1.5 rounded-lg text-sm transition">📅 SIP</span>
+            <span className="font-bold text-lg tracking-tight text-white group-hover:text-emerald-300 transition">SIP-MAPEL</span>
+          </Link>
 
           <nav className="flex items-center gap-1 sm:gap-2">
+            <Link
+              href="/"
+              className="px-3 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition"
+            >
+              Beranda
+            </Link>
             <Link
               href="/master/teachers"
               className="px-3 py-1.5 rounded-md text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition"
