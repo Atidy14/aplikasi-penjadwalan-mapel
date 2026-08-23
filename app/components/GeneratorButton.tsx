@@ -41,9 +41,13 @@ export default function GeneratorButton() {
 
     startTransition(async () => {
       try {
-        const res = await runAutoGenerator();
-        setResult(res);
-        setCanUndo(true);
+        const res: any = await runAutoGenerator();
+        if (res && res.error) {
+          setError(res.error);
+        } else {
+          setResult(res);
+          setCanUndo(true);
+        }
       } catch (err: any) {
         setError(err.message || "Terjadi kesalahan saat menyusun jadwal.");
       }
@@ -60,9 +64,13 @@ export default function GeneratorButton() {
 
     startUndoTransition(async () => {
       try {
-        const res = await runUndoGenerator();
-        setUndoMessage(`Berhasil memulihkan ${res.restoredCount} blok jadwal dari backup sebelumnya.`);
-        setCanUndo(false);
+        const res: any = await runUndoGenerator();
+        if (res && res.error) {
+          setError(res.error);
+        } else {
+          setUndoMessage(`Berhasil memulihkan ${res.restoredCount} blok jadwal dari backup sebelumnya.`);
+          setCanUndo(false);
+        }
       } catch (err: any) {
         setError(err.message || "Gagal melakukan Undo.");
       }
