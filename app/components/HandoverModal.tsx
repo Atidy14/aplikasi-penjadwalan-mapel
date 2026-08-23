@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { processTeacherHandover } from "@/actions/handoverActions";
+import { processTeacherHandover } from "@/app/actions/handoverActions";
 
 type Teacher = {
   id: string;

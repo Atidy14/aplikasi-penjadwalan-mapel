@@ -1,4 +1,4 @@
-import { getClassGroups, addClassGroup } from "@/actions/masterDataActions";
+import { getClassGroups, addClassGroup } from "@/app/actions/masterDataActions";
 import Link from "next/link";
 
 export default async function ClassesPage() {

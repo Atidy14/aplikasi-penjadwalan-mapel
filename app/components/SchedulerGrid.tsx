@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import { assignScheduleSlot, clearScheduleSlot } from "@/actions/schedulerActions";
-import { DayOfWeek } from "@prisma/client";
+import { assignScheduleSlot, clearScheduleSlot } from "@/app/actions/schedulerActions";
+
+export type DayOfWeek = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
 
 type ScheduleItem = {
   id: string;

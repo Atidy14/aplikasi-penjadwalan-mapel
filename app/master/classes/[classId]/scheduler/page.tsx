@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/app/lib/prisma";
 import { 
   getSchedulesByClass, 
   getAllTimeSettings, 
   getSchedulerDropdownData,
   getClassSubjectValidations
-} from "@/actions/schedulerActions";
-import SchedulerGrid from "@/components/SchedulerGrid";
+} from "@/app/actions/schedulerActions";
+import SchedulerGrid from "@/app/components/SchedulerGrid";
 import Link from "next/link";
 
 type Props = {

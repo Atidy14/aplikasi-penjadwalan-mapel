@@ -1,4 +1,4 @@
-import { getAuditLogs } from "@/actions/handoverActions";
+import { getAuditLogs } from "@/app/actions/handoverActions";
 import Link from "next/link";
 
 export default async function AuditHistoryPage() {

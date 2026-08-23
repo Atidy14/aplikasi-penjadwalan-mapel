@@ -1,9 +1,12 @@
-import { getTeachers, addTeacher, toggleTeacherStatus } from "@/actions/masterDataActions";
+import { getTeachers, addTeacher, toggleTeacherStatus } from "@/app/actions/masterDataActions";
+import { getAllTimeSettings } from "@/app/actions/schedulerActions";
 import Link from "next/link";
-import HandoverModal from "@/components/HandoverModal";
+import HandoverModal from "@/app/components/HandoverModal";
+import ConstraintModal from "@/app/components/ConstraintModal";
 
 export default async function TeachersPage() {
   const teachers = await getTeachers();
+  const timeSettings = await getAllTimeSettings();
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
@@ -75,8 +78,9 @@ export default async function TeachersPage() {
                           {t.status === "ACTIVE" ? "Aktif" : "Nonaktif"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <form action={toggleTeacherStatus.bind(null, t.id, t.status)}>
+                      <td className="px-6 py-4 text-right space-x-3">
+                        <ConstraintModal teacher={t} constraints={t.constraints || []} timeSettings={timeSettings} />
+                        <form action={toggleTeacherStatus.bind(null, t.id, t.status)} className="inline">
                           <button 
                             type="submit" 
                             className="text-sm font-medium text-blue-600 hover:text-blue-800"

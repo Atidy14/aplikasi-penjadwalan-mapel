@@ -1,4 +1,4 @@
-import { getSubjects, addSubject } from "@/actions/masterDataActions";
+import { getSubjects, addSubject } from "@/app/actions/masterDataActions";
 import Link from "next/link";
 
 export default async function SubjectsPage() {

@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 // =======================
 export async function getTeachers() {
   return await prisma.teacher.findMany({
+    include: { constraints: true },
     orderBy: { name: "asc" },
   });
 }

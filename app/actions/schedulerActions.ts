@@ -2,8 +2,8 @@
 
 import { prisma } from "../lib/prisma";
 import { revalidatePath } from "next/cache";
+export type DayOfWeek = "MONDAY" | "TUESDAY" | "WEDNESDAY" | "THURSDAY" | "FRIDAY" | "SATURDAY" | "SUNDAY";
 import { validateSubjectPeriods, ValidationResult } from "../lib/services/scheduleValidationService";
-import { DayOfWeek } from "@prisma/client";
 
 // =======================
 // SCHEDULER ACTIONS
