@@ -21,8 +21,9 @@ export async function generateAutomaticSchedule(academicYearId: string) {
   const teacherBusy = new Set<string>(); // "teacherId-day-period"
   const classBusy = new Set<string>();   // "classId-day-period"
   const subjectDayCount = new Map<string, number>(); // "classId-subjectId-day" -> count
+  const classDayTotalPeriods = new Map<string, number>(); // "classId-day" -> total jam terisi
 
-  // Muat "Permintaan Khusus" Guru (Hari/Jam Larangan)
+  // Muat "Permintaan Khusus" Guru (Hari/Jam Larangan / Izin)
   const allConstraints = await prisma.teacherConstraint.findMany();
   for (const c of allConstraints) {
     teacherBusy.add(`${c.teacherId}-${c.dayOfWeek}-${c.periodNumber}`);
@@ -65,43 +66,94 @@ export async function generateAutomaticSchedule(academicYearId: string) {
     where: { academicYearId }
   });
 
-  // 4. Algoritma Greedy Heuristic
+  // 4. Algoritma Greedy Heuristic dengan Distribusi Hari Merata (Balanced Day Distribution)
   for (const load of teachingLoads) {
     let periodsToAssign = load.targetPeriods;
 
-    // Coba mencari slot kosong
-    for (const day of DAYS) {
-      if (periodsToAssign === 0) break;
+    while (periodsToAssign > 0) {
+      // Urutkan hari berdasarkan hari yang jamnya paling sedikit terisi di kelas ini (Load Balancing)
+      const sortedDays = [...DAYS].sort((a, b) => {
+        const countA = classDayTotalPeriods.get(`${load.classGroupId}-${a}`) || 0;
+        const countB = classDayTotalPeriods.get(`${load.classGroupId}-${b}`) || 0;
+        if (countA !== countB) return countA - countB;
+        return DAYS.indexOf(a) - DAYS.indexOf(b);
+      });
 
-      for (const ts of timeSettings) {
+      let placedInThisPass = false;
+
+      for (const day of sortedDays) {
         if (periodsToAssign === 0) break;
 
-        const teacherKey = `${load.teacherId}-${day}-${ts.periodNumber}`;
-        const classKey = `${load.classGroupId}-${day}-${ts.periodNumber}`;
         const subjectDayKey = `${load.classGroupId}-${load.subjectId}-${day}`;
-
         const currentSubjectCount = subjectDayCount.get(subjectDayKey) || 0;
 
-        // Cek bentrok Guru, bentrok Kelas, dan batasi max 2 jam mapel yang sama per hari
-        if (!teacherBusy.has(teacherKey) && !classBusy.has(classKey) && currentSubjectCount < 2) {
-          // Slot Ditemukan!
-          newSchedules.push({
-            academicYearId,
-            classGroupId: load.classGroupId,
-            subjectId: load.subjectId,
-            teacherId: load.teacherId,
-            dayOfWeek: day,
-            periodNumber: ts.periodNumber,
-            validFrom: new Date()
-          });
+        // Batasi maksimal 2 jam mapel yang sama dalam 1 hari di kelas yang sama
+        if (currentSubjectCount >= 2) continue;
 
-          // Tandai slot sebagai terisi
-          teacherBusy.add(teacherKey);
-          classBusy.add(classKey);
-          subjectDayCount.set(subjectDayKey, currentSubjectCount + 1);
-          
-          periodsToAssign--;
+        for (const ts of timeSettings) {
+          if (periodsToAssign === 0) break;
+
+          const teacherKey = `${load.teacherId}-${day}-${ts.periodNumber}`;
+          const classKey = `${load.classGroupId}-${day}-${ts.periodNumber}`;
+
+          // Cek bentrok Guru dan bentrok Kelas
+          if (!teacherBusy.has(teacherKey) && !classBusy.has(classKey)) {
+            // Pasang slot utama
+            newSchedules.push({
+              academicYearId,
+              classGroupId: load.classGroupId,
+              subjectId: load.subjectId,
+              teacherId: load.teacherId,
+              dayOfWeek: day,
+              periodNumber: ts.periodNumber,
+              validFrom: new Date()
+            });
+
+            teacherBusy.add(teacherKey);
+            classBusy.add(classKey);
+            subjectDayCount.set(subjectDayKey, currentSubjectCount + 1);
+
+            const currentClassDayTotal = classDayTotalPeriods.get(`${load.classGroupId}-${day}`) || 0;
+            classDayTotalPeriods.set(`${load.classGroupId}-${day}`, currentClassDayTotal + 1);
+
+            periodsToAssign--;
+            placedInThisPass = true;
+
+            // Jika masih butuh jam dan slot berikutnya langsung kosong di hari yang sama, buatkan jam gandeng/berurutan (consecutive block)
+            if (periodsToAssign > 0 && currentSubjectCount + 1 < 2) {
+              const nextPeriod = ts.periodNumber + 1;
+              const nextTs = timeSettings.find((t) => t.periodNumber === nextPeriod);
+              if (nextTs) {
+                const nextTeacherKey = `${load.teacherId}-${day}-${nextPeriod}`;
+                const nextClassKey = `${load.classGroupId}-${day}-${nextPeriod}`;
+                if (!teacherBusy.has(nextTeacherKey) && !classBusy.has(nextClassKey)) {
+                  newSchedules.push({
+                    academicYearId,
+                    classGroupId: load.classGroupId,
+                    subjectId: load.subjectId,
+                    teacherId: load.teacherId,
+                    dayOfWeek: day,
+                    periodNumber: nextPeriod,
+                    validFrom: new Date()
+                  });
+
+                  teacherBusy.add(nextTeacherKey);
+                  classBusy.add(nextClassKey);
+                  subjectDayCount.set(subjectDayKey, currentSubjectCount + 2);
+                  classDayTotalPeriods.set(`${load.classGroupId}-${day}`, currentClassDayTotal + 2);
+                  periodsToAssign--;
+                }
+              }
+            }
+
+            break; // Lanjut distribusikan ke hari lain yang masih longgar
+          }
         }
+      }
+
+      // Jika tidak ada slot yang bisa diisi lagi pada putaran ini (misal karena constraint penuh)
+      if (!placedInThisPass) {
+        break;
       }
     }
 
@@ -140,36 +192,39 @@ export async function generateAutomaticSchedule(academicYearId: string) {
     success: true,
     generatedCount: newSchedules.length,
     unassigned,
-    canUndo: previousSchedules.length > 0,
+    canUndo: true,
   };
 }
 
+/**
+ * Membatalkan (Undo) generate terakhir dan memulihkan snapshot jadwal sebelumnya
+ */
 export async function undoLastScheduleGeneration(academicYearId: string) {
-  // Cari snapshot backup terbaru
-  const lastSnapshot = await prisma.auditLog.findFirst({
+  // 1. Cari snapshot backup terakhir di AuditLog
+  const lastBackup = await prisma.auditLog.findFirst({
     where: { action: "SCHEDULE_SNAPSHOT_BACKUP" },
-    orderBy: { timestamp: "desc" }
+    orderBy: { timestamp: "desc" },
   });
 
-  if (!lastSnapshot || !lastSnapshot.details) {
-    throw new Error("Tidak ditemukan riwayat backup jadwal sebelumnya untuk di-undo.");
+  if (!lastBackup) {
+    throw new Error("Tidak ditemukan data backup jadwal sebelumnya untuk dipulihkan.");
   }
 
-  const details = lastSnapshot.details as any;
-  const backupSchedules = details.schedules || [];
+  const details = lastBackup.details as any;
+  const backupSchedules: any[] = details?.schedules || [];
 
   if (backupSchedules.length === 0) {
-    throw new Error("Data backup jadwal kosong.");
+    throw new Error("Data backup kosong atau tidak memiliki riwayat jadwal.");
   }
 
-  // 1. Hapus jadwal yang ada saat ini
+  // 2. Hapus jadwal yang ada saat ini
   await prisma.schedule.deleteMany({
     where: { academicYearId }
   });
 
-  // 2. Pulihkan jadwal dari backup
-  const formattedSchedules = backupSchedules.map((s: any) => ({
-    academicYearId: s.academicYearId,
+  // 3. Pulihkan data jadwal dari snapshot
+  const restoredSchedules = backupSchedules.map((s) => ({
+    academicYearId: s.academicYearId || academicYearId,
     classGroupId: s.classGroupId,
     subjectId: s.subjectId,
     teacherId: s.teacherId,
@@ -180,34 +235,38 @@ export async function undoLastScheduleGeneration(academicYearId: string) {
   }));
 
   await prisma.schedule.createMany({
-    data: formattedSchedules
+    data: restoredSchedules,
   });
 
-  // 3. Catat di Audit Log
+  // 4. Hapus log snapshot yang baru saja digunakan agar tidak double undo ke snapshot yang sama
+  await prisma.auditLog.delete({
+    where: { id: lastBackup.id }
+  });
+
+  // 5. Catat aksi Undo ke Audit Log
   await prisma.auditLog.create({
     data: {
-      action: "RESTORE_SCHEDULE_UNDO",
+      action: "UNDO_SCHEDULE_GENERATION",
       details: {
-        restoredCount: formattedSchedules.length,
-        restoredFromDate: lastSnapshot.timestamp
+        restoredCount: restoredSchedules.length,
+        restoredFromTimestamp: details.timestamp,
       },
-      performedBy: "User via Undo Button"
+      performedBy: "Administrator (Undo Action)"
     }
   });
 
-  // Hapus snapshot yang sudah di-restore
-  await prisma.auditLog.delete({ where: { id: lastSnapshot.id } });
-
   return {
     success: true,
-    restoredCount: formattedSchedules.length
+    restoredCount: restoredSchedules.length,
   };
 }
 
+/**
+ * Cek apakah ada backup snapshot yang bisa di-undo
+ */
 export async function checkCanUndo() {
-  const lastSnapshot = await prisma.auditLog.findFirst({
+  const lastBackup = await prisma.auditLog.findFirst({
     where: { action: "SCHEDULE_SNAPSHOT_BACKUP" },
-    orderBy: { timestamp: "desc" }
   });
-  return !!lastSnapshot;
+  return lastBackup !== null;
 }
