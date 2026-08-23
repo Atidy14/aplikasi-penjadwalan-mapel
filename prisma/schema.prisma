@@ -1,13 +1,139 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
-  output   = "../app/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum TeacherStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+model AcademicYear {
+  id        String   @id @default(uuid())
+  name      String   // e.g., "2026/2027 Ganjil"
+  isActive  Boolean  @default(false)
+  
+  classes       ClassGroup[]
+  teachingLoads TeachingLoad[]
+  schedules     Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+  id        String        @id @default(uuid())
+  name      String
+  status    TeacherStatus @default(ACTIVE)
+  
+  teachingLoads TeachingLoad[]
+  schedules     Schedule[]
+  
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model Subject {
+  id                   String @id @default(uuid())
+  name                 String
+  targetPeriodsPerWeek Int
+  
+  teachingLoads        TeachingLoad[]
+  schedules            Schedule[]
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model ClassGroup {
+  id             String @id @default(uuid())
+  academicYearId String
+  name           String
+  
+  academicYear  AcademicYear @relation(fields: [academicYearId], references: [id])
+  teachingLoads TeachingLoad[]
+  schedules     Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Kertas Kerja (Penugasan Mengajar)
+model TeachingLoad {
+  id             String @id @default(uuid())
+  academicYearId String
+  classGroupId   String
+  subjectId      String
+  teacherId      String
+  
+  // Berapa jam guru ini ditugaskan mengajar mapel ini di kelas ini
+  targetPeriods  Int
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
+  classGroup   ClassGroup   @relation(fields: [classGroupId], references: [id])
+  subject      Subject      @relation(fields: [subjectId], references: [id])
+  teacher      Teacher      @relation(fields: [teacherId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([academicYearId, classGroupId, subjectId]) // 1 Mapel di 1 Kelas biasanya diajar 1 Guru
+}
+
+model TimeSetting {
+  id           String @id @default(uuid())
+  periodNumber Int    @unique
+  startTime    String // e.g., "07:00"
+  endTime      String // e.g., "07:40"
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Schedule {
+  id             String    @id @default(uuid())
+  academicYearId String
+  classGroupId   String
+  subjectId      String
+  teacherId      String
+  dayOfWeek      DayOfWeek
+  periodNumber   Int
+
+  validFrom    DateTime  @default(now())
+  validUntil   DateTime?
+
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id])
+  classGroup   ClassGroup   @relation(fields: [classGroupId], references: [id])
+  subject      Subject      @relation(fields: [subjectId], references: [id])
+  teacher      Teacher      @relation(fields: [teacherId], references: [id])
+
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([academicYearId, classGroupId, validFrom, validUntil])
+  @@index([teacherId, validFrom, validUntil])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  action      String
+  details     Json
+  timestamp   DateTime @default(now())
+  performedBy String?
 }
