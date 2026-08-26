@@ -544,7 +544,7 @@ def create_manual_book():
     add_callout("Administrator atau Auditor Eksternal dapat menjalankan verifikasi sistem sewaktu-waktu dengan menjalankan perintah: `npm test` di terminal.", "SUCCESS")
 
     # Simpan File Dokumen DOCX
-    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.2_ENTERPRISE.docx"
+    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.3_ENTERPRISE.docx"
     doc.save(output_filename)
     print(f"[SUCCESS] Dokumen Manual Book berhasil dibuat: {output_filename}")
 
