@@ -484,7 +484,13 @@ def create_manual_book():
         r_ci.font.bold = True
         p_ci.add_run(c_exp)
 
+    add_image_if_exists("11_pusat_bentrok.png", "Halaman Pusat Deteksi Bentrok (Conflict Center) Lengkap dengan Frame Scroll Bar")
+
     add_callout("Jika seluruh jadwal bersih, halaman ini menampilkan lencana hijau 'Zero Conflict • 100% Bersih', menandakan jadwal siap dicetak ke format PDF resmi.", "SUCCESS")
+
+    add_section_header("11.1 Cetak & Ekspor PDF Resmi")
+    p_pdf = doc.add_paragraph("Diakses melalui menu 'Laporan PDF' (`/master/print`). Format dokumen resmi telah terintegrasi dengan Kop Surat Yayasan Annida Al Islamy 2, Ponpes Annida Al Islamy 2 Setu Bekasi, dan SMP Annida Al Islamy siap tanda tangan Kepala Sekolah.")
+    add_image_if_exists("12_cetak_pdf.png", "Dokumen Jadwal Pelajaran Resmi Siap Cetak dan Ekspor PDF")
 
     # ==========================================
     # BAB 12: PANDUAN TEKNIS & TROUBLESHOOTING
@@ -538,7 +544,7 @@ def create_manual_book():
     add_callout("Administrator atau Auditor Eksternal dapat menjalankan verifikasi sistem sewaktu-waktu dengan menjalankan perintah: `npm test` di terminal.", "SUCCESS")
 
     # Simpan File Dokumen DOCX
-    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.1_ENTERPRISE.docx"
+    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.2_ENTERPRISE.docx"
     doc.save(output_filename)
     print(f"[SUCCESS] Dokumen Manual Book berhasil dibuat: {output_filename}")
 
