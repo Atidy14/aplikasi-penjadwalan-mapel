@@ -136,93 +136,148 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Top Bar Informasi */}
-      <div className="bg-emerald-900 text-emerald-100 text-xs py-2 px-6">
+      <div className="bg-emerald-950 text-emerald-100 text-xs py-2 px-6 border-b border-emerald-900/50">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
           <div className="flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Sistem Informasi Penjadwalan Mata Pelajaran Terpadu</span>
+            <span className="font-semibold text-emerald-200">
+              Yayasan Annida Al Islamy Setu Bekasi • Ponpes Annida Al Islamy 2 • SMP Annida Al Islamy
+            </span>
           </div>
-          <div className="flex items-center gap-4">
-            <span>Tahun Ajaran Aktif: <strong className="text-white">{activeYear?.name || "2026/2027 Ganjil"}</strong></span>
+          <div className="flex items-center gap-4 text-[11px]">
+            <span>Tahun Ajaran: <strong className="text-white font-bold">{activeYear?.name || "2026/2027 Ganjil"}</strong></span>
             <span>|</span>
-            <span className="text-emerald-300">Status: Siap Beroperasi</span>
+            <span className="text-emerald-300 font-medium">Status: Siap Beroperasi</span>
           </div>
         </div>
       </div>
 
       {/* Header Portal Utama */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          
+          {/* Logo & 3-Tier Compact Institutional Title */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-black text-xl shadow-md group-hover:scale-105 transition">
-              📅
+            {/* Logo 5 Buku Hijau */}
+            <div className="w-12 h-14 rounded-lg overflow-hidden border border-emerald-200 bg-emerald-50 p-0.5 shadow-xs group-hover:scale-105 transition shrink-0 flex items-center justify-center">
+              <img
+                src="/annida-logo.jpg"
+                alt="Logo Annida Al Islamy"
+                className="w-full h-full object-contain"
+              />
             </div>
-            <div>
-              <div className="font-extrabold text-xl tracking-tight text-slate-900 flex items-center gap-2">
-                SIP-MAPEL
-                <span className="text-[11px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">
-                  v2.0 Pro
+            
+            {/* 3 Baris Nama Lembaga (Format Kecil & Rapi) */}
+            <div className="flex flex-col justify-center">
+              <span className="text-[10px] sm:text-[11px] font-bold text-emerald-800 tracking-tight leading-tight uppercase">
+                Yayasan Annida Al Islamy Setu Bekasi
+              </span>
+              <span className="text-xs sm:text-sm font-extrabold text-slate-900 leading-tight">
+                Ponpes Annida Al Islamy 2 Setu Bekasi
+              </span>
+              <div className="text-[11px] sm:text-xs font-bold text-emerald-700 leading-tight flex items-center gap-2 mt-0.5">
+                <span>SMP Annida Al Islamy</span>
+                <span className="text-[9px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded border border-emerald-200">
+                  SIP-MAPEL v2.0 Pro
                 </span>
               </div>
-              <p className="text-xs text-slate-500 font-medium">Sistem Penjadwalan Sekolah Otomatis</p>
             </div>
           </Link>
 
-          {/* Quick Action Navigation */}
-          <div className="flex items-center gap-3">
-            <Link
-              href="/master/classes"
-              className="hidden sm:inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-emerald-700 px-4 py-2 rounded-lg hover:bg-slate-100 transition"
-            >
-              <Calendar className="w-4 h-4" />
-              Papan Jadwal
-            </Link>
-            <Link
-              href="/master/auto-generate"
-              className="inline-flex items-center gap-2 text-sm font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
-            >
-              <Zap className="w-4 h-4 fill-current" />
-              Auto-Generate
-            </Link>
+          {/* Kaligrafi Arab & Aksi Cepat */}
+          <div className="flex items-center gap-5">
+            {/* Tulisan Arab Elegan */}
+            <div dir="rtl" className="hidden lg:block text-xl sm:text-2xl font-black text-emerald-800 tracking-wide font-serif">
+              معهد النداء الإسلامي ٢
+            </div>
+
+            {/* Tombol Pintas */}
+            <div className="flex items-center gap-2">
+              <Link
+                href="/master/classes"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-emerald-700 px-3.5 py-2 rounded-lg hover:bg-slate-100 transition"
+              >
+                <Calendar className="w-4 h-4 text-emerald-600" />
+                Papan Jadwal
+              </Link>
+              <Link
+                href="/master/auto-generate"
+                className="inline-flex items-center gap-1.5 text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                Auto-Generate
+              </Link>
+            </div>
           </div>
+
         </div>
       </header>
 
-      {/* Hero Section Banner ala Portal Publik BPJS Ketenagakerjaan */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white py-16 px-6">
+      {/* Hero Section Banner ala Portal BPJS / Lembaga Pendidikan */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 text-white py-14 px-6">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#10b981_1px,transparent_1px)] [background-size:16px_16px]"></div>
         
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-6">
-              <Sparkles className="w-3.5 h-3.5" />
-              Algoritma Penjadwalan Cerdas Bebas Bentrok
-            </div>
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
             
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight mb-4 text-white">
-              Penyusunan Jadwal Sekolah Lebih <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Cepat, Akurat & Otomatis.</span>
-            </h1>
-            
-            <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-8">
-              Portal manajemen penugasan guru dan penyusunan jadwal belajar mengajar terintegrasi. Dilengkapi validasi bentrok instan, ketersediaan guru, serta rekam jejak historis lengkap.
-            </p>
+            <div className="max-w-3xl">
+              {/* Badge Lembaga Dwibahasa */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold mb-4">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Annida Al Islamy 2 Islamic Boarding School</span>
+                <span>•</span>
+                <span dir="rtl" className="font-bold">معهد النداء الإسلامي ٢</span>
+              </div>
+              
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight leading-tight mb-3 text-white">
+                Sistem Penjadwalan Pembelajaran Terpadu
+              </h1>
+              
+              <p className="text-emerald-300 font-semibold text-sm sm:text-base mb-2">
+                SMP Annida Al Islamy — Ponpes Annida Al Islamy 2 Setu Bekasi
+              </p>
 
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/master/auto-generate"
-                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-3.5 rounded-xl shadow-lg hover:shadow-emerald-500/25 transition transform hover:-translate-y-0.5 text-sm"
-              >
-                <Zap className="w-4 h-4 fill-current" />
-                Mulai Auto-Generate Jadwal
-              </Link>
-              <Link
-                href="/master/teaching-load"
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold px-6 py-3.5 rounded-xl backdrop-blur-sm transition text-sm"
-              >
-                <BookOpen className="w-4 h-4" />
-                Atur Kertas Kerja (Beban Guru)
-              </Link>
+              <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 max-w-2xl">
+                Portal terpadu manajemen penugasan guru pengampu dan penyusunan jadwal belajar mengajar bebas bentrok. Dilengkapi modul ketersediaan waktu guru, serah terima jabatan historis, dan cetak PDF resmi.
+              </p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/master/auto-generate"
+                  className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-3 rounded-xl shadow-lg hover:shadow-emerald-500/25 transition transform hover:-translate-y-0.5 text-xs sm:text-sm"
+                >
+                  <Zap className="w-4 h-4 fill-current" />
+                  Mulai Auto-Generate Jadwal
+                </Link>
+                <Link
+                  href="/master/teaching-load"
+                  className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold px-5 py-3 rounded-xl backdrop-blur-sm transition text-xs sm:text-sm"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Kertas Kerja Penugasan
+                </Link>
+                <Link
+                  href="/master/print"
+                  className="inline-flex items-center gap-2 bg-emerald-800/60 hover:bg-emerald-800 text-emerald-100 border border-emerald-700/60 font-semibold px-5 py-3 rounded-xl backdrop-blur-sm transition text-xs sm:text-sm"
+                >
+                  🖨️ Cetak Rekap PDF
+                </Link>
+              </div>
             </div>
+
+            {/* Kaligrafi Arab Besar di Banner Kanan */}
+            <div className="hidden lg:flex flex-col items-center justify-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xs text-center">
+              <div dir="rtl" className="text-3xl font-black text-emerald-300 font-serif leading-relaxed">
+                معهد النداء الإسلامي ٢
+              </div>
+              <div className="text-[11px] font-bold text-slate-300 tracking-wider uppercase mt-1">
+                Annida Al Islamy 2
+              </div>
+              <div className="text-[10px] text-emerald-400 font-medium">
+                Setu, Bekasi - Jawa Barat
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
@@ -251,91 +306,85 @@ export default async function Home() {
           </div>
 
           <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold">
-              <GraduationCap className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+              <BookOpen className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-2xl font-black text-slate-900">{totalSubjects}</div>
-              <div className="text-xs font-semibold text-slate-500">Mata Pelajaran</div>
+              <div className="text-2xl font-black text-slate-900">{totalLoads}</div>
+              <div className="text-xs font-semibold text-slate-500">Matriks Kertas Kerja</div>
             </div>
           </div>
 
           <div className="bg-white p-5 rounded-2xl shadow-md border border-slate-100 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-              <Calendar className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+              <Clock className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-2xl font-black text-emerald-600">{totalSchedules}</div>
-              <div className="text-xs font-semibold text-slate-500">Blok Jadwal Aktif</div>
+              <div className="text-2xl font-black text-slate-900">{totalSchedules}</div>
+              <div className="text-xs font-semibold text-slate-500">Blok Jam Terjadwal</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Grid Menu Portal Layanan Utama (ala BPJS Ketenagakerjaan) */}
+      {/* Grid Menu Portal (8 Layanan Utama) */}
       <section className="max-w-7xl mx-auto px-6 py-16">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-10 gap-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
           <div>
-            <div className="text-emerald-700 font-bold text-xs uppercase tracking-wider mb-1 flex items-center gap-1.5">
+            <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-wider mb-1">
               <Sparkles className="w-4 h-4" />
-              Menu Portal Terpadu
+              Menu Layanan Terintegrasi
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Pilihan Layanan & Pengelolaan Jadwal
+              Pusat Navigasi Kurikulum & Penjadwalan
             </h2>
           </div>
-          <p className="text-sm text-slate-500 max-w-md">
-            Pilih menu layanan di bawah ini untuk mengakses modul konfigurasi, pengaturan guru, hingga eksekusi penjadwalan.
+          <p className="text-xs text-slate-500 max-w-md">
+            Pilih modul di bawah ini untuk mengelola data master guru, rombel kelas, menyusun kertas kerja, hingga mencetak dokumen jadwal.
           </p>
         </div>
 
-        {/* Grid Cards Menu */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {menuItems.map((item, index) => {
+          {menuItems.map((item, idx) => {
             const Icon = item.icon;
             return (
               <Link
-                key={index}
+                key={idx}
                 href={item.href}
-                className={`group relative bg-white rounded-2xl p-6 border transition-all duration-300 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 ${
+                className={`group relative p-6 bg-white rounded-2xl border transition duration-200 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1 ${
                   item.highlight
-                    ? "border-indigo-200 ring-2 ring-indigo-500/20 bg-gradient-to-b from-indigo-50/30 to-white"
-                    : "border-slate-200/80 hover:border-slate-300"
+                    ? "border-indigo-300 ring-2 ring-indigo-500/20 shadow-md"
+                    : "border-slate-200 hover:border-slate-300 shadow-xs"
                 }`}
               >
                 <div>
-                  {/* Card Header: Icon & Badge */}
-                  <div className="flex items-center justify-between mb-5">
+                  <div className="flex justify-between items-start mb-4">
                     <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold transition duration-300 ${item.iconBg}`}
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center transition ${item.iconBg}`}
                     >
                       <Icon className="w-6 h-6" />
                     </div>
                     <span
-                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${item.badgeColor}`}
+                      className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${item.badgeColor}`}
                     >
                       {item.badge}
                     </span>
                   </div>
 
-                  {/* Category & Title */}
-                  <div className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                     {item.category}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition mb-2">
+                  <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-600 transition mb-2">
                     {item.title}
                   </h3>
-
-                  {/* Description */}
-                  <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">
+                  <p className="text-xs text-slate-500 leading-relaxed">
                     {item.desc}
                   </p>
                 </div>
 
-                {/* Card Action Link */}
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
+                <div className="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-emerald-600 transition">
                   <span>Buka Modul</span>
-                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition duration-200" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition" />
                 </div>
               </Link>
             );
@@ -343,74 +392,89 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Section Alur Kerja Ringkas (Workflow Steps) */}
-      <section className="bg-slate-900 text-white py-16 px-6">
+      {/* Alur Kerja 4 Langkah */}
+      <section className="bg-slate-100 border-y border-slate-200 py-16 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-emerald-400 text-xs font-bold uppercase tracking-wider">
-              Panduan Langkah Mudah
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black mt-2">
-              4 Langkah Cepat Menghasilkan Jadwal Sempurna
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+              4 Langkah Mudah Menyusun Jadwal Sekolah
             </h2>
+            <p className="text-xs text-slate-500 mt-2">
+              Ikuti alur standar berikut untuk memastikan seluruh jadwal terdistribusi optimal tanpa bentrok.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-slate-800/60 border border-slate-700 p-6 rounded-2xl relative">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-black text-sm flex items-center justify-center mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="p-6 bg-white rounded-2xl shadow-xs border border-slate-200 relative">
+              <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-black text-sm flex items-center justify-center mb-4">
                 1
               </div>
-              <h4 className="font-bold text-base mb-1">Input Data Master</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Tambahkan data Guru, Mata Pelajaran beserta target jam, dan Rombel Kelas yang dibuka.
+              <h3 className="font-bold text-sm text-slate-900 mb-1">Lengkapi Master Data</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Daftarkan Guru, Mata Pelajaran, dan Struktur Kelas di menu master.
               </p>
             </div>
 
-            <div className="bg-slate-800/60 border border-slate-700 p-6 rounded-2xl relative">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-black text-sm flex items-center justify-center mb-4">
+            <div className="p-6 bg-white rounded-2xl shadow-xs border border-slate-200 relative">
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 font-black text-sm flex items-center justify-center mb-4">
                 2
               </div>
-              <h4 className="font-bold text-base mb-1">Susun Kertas Kerja</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Tugaskan guru mana yang mengajar mapel apa di tiap kelas pada menu Kertas Kerja.
+              <h3 className="font-bold text-sm text-slate-900 mb-1">Atur Kertas Kerja</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Tentukan penugasan guru pengampu dan target jam mengajar per minggu di menu Kertas Kerja.
               </p>
             </div>
 
-            <div className="bg-slate-800/60 border border-slate-700 p-6 rounded-2xl relative">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-black text-sm flex items-center justify-center mb-4">
+            <div className="p-6 bg-white rounded-2xl shadow-xs border border-slate-200 relative">
+              <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-800 font-black text-sm flex items-center justify-center mb-4">
                 3
               </div>
-              <h4 className="font-bold text-base mb-1">Eksekusi Auto-Generate</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Klik tombol Auto-Generator. Algoritma akan mendistribusikan jadwal bebas bentrok.
+              <h3 className="font-bold text-sm text-slate-900 mb-1">Jalankan Auto-Generator</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Klik tombol Auto-Generate untuk memetakan ratusan jam pelajaran secara instan dan bebas bentrok.
               </p>
             </div>
 
-            <div className="bg-slate-800/60 border border-slate-700 p-6 rounded-2xl relative">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-black text-sm flex items-center justify-center mb-4">
+            <div className="p-6 bg-white rounded-2xl shadow-xs border border-slate-200 relative">
+              <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 font-black text-sm flex items-center justify-center mb-4">
                 4
               </div>
-              <h4 className="font-bold text-base mb-1">Tinjau Papan Jadwal</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Lihat hasil grid jadwal per kelas, monitor pemenuhan jam, atau sesuaikan slot jika perlu.
+              <h3 className="font-bold text-sm text-slate-900 mb-1">Tinjau & Cetak PDF</h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Periksa hasil di Papan Jadwal dan cetak dokumen resmi per kelas atau per guru siap tanda tangan.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer Portal */}
-      <footer className="bg-white border-t border-slate-200 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-          <div>
-            &copy; {new Date().getFullYear()} <strong>SIP-MAPEL</strong> — Sistem Informasi Penjadwalan Mata Pelajaran.
+      {/* Footer Resmi Lembaga */}
+      <footer className="bg-slate-950 text-slate-400 text-xs py-10 px-6 border-t border-slate-900">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <img
+              src="/annida-logo.jpg"
+              alt="Logo Annida Al Islamy"
+              className="w-10 h-12 object-contain rounded bg-white/10 p-1"
+            />
+            <div>
+              <div className="font-bold text-slate-200 text-sm">
+                Yayasan Annida Al Islamy Setu Bekasi
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Ponpes Annida Al Islamy 2 Setu Bekasi • SMP Annida Al Islamy
+              </p>
+              <p className="text-[10px] text-emerald-400 font-semibold" dir="rtl">
+                معهد النداء الإسلامي ٢
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-6">
-            <Link href="/master/teachers" className="hover:text-emerald-700">Guru</Link>
-            <Link href="/master/classes" className="hover:text-emerald-700">Kelas</Link>
-            <Link href="/master/subjects" className="hover:text-emerald-700">Mapel</Link>
-            <Link href="/master/teaching-load" className="hover:text-emerald-700">Kertas Kerja</Link>
-            <Link href="/master/auto-generate" className="hover:text-emerald-700 font-bold text-emerald-600">Auto-Generate</Link>
+
+          <div className="text-center sm:text-right text-[11px] text-slate-400">
+            <p>© 2026 Yayasan Annida Al Islamy Setu Bekasi. Seluruh Hak Cipta Dilindungi.</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">
+              Sistem Informasi Penjadwalan Pelajaran Sekolah (SIP-MAPEL v2.0 Pro)
+            </p>
           </div>
         </div>
       </footer>

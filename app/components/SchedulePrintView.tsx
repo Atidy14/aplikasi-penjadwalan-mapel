@@ -173,15 +173,32 @@ export default function SchedulePrintView({
                 style={{ pageBreakAfter: "always" }}
               >
                 {/* Kop Resmi Sekolah */}
-                <div className="text-center border-b-2 border-slate-900 pb-4 mb-6">
-                  <h2 className="text-xl font-black uppercase tracking-wider text-slate-900">
-                    SMA / SMK NEGERI CONTOH
-                  </h2>
-                  <h3 className="text-base font-bold text-slate-700">
-                    JADWAL PELAJARAN TAHUN AJARAN {academicYearName.toUpperCase()}
-                  </h3>
-                  <div className="mt-2 inline-block bg-slate-900 text-white text-xs font-black px-4 py-1 rounded-full uppercase tracking-wider">
-                    {cls.name}
+                <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-6">
+                  <div className="flex items-center gap-3">
+                    <img src="/annida-logo.jpg" alt="Logo" className="w-14 h-16 object-contain shrink-0" />
+                    <div className="text-left">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                        YAYASAN ANNIDA AL ISLAMY SETU BEKASI
+                      </h4>
+                      <h2 className="text-base font-black text-slate-900 leading-tight">
+                        PONPES ANNIDA AL ISLAMY 2 SETU BEKASI
+                      </h2>
+                      <h3 className="text-xs font-bold text-slate-700">
+                        SMP ANNIDA AL ISLAMY — JADWAL PELAJARAN {academicYearName.toUpperCase()}
+                      </h3>
+                      <div className="text-[10px] text-slate-500">
+                        Annida Al Islamy 2 Islamic Boarding School • Setu, Bekasi - Jawa Barat
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="text-right flex flex-col items-end">
+                    <div dir="rtl" className="text-lg font-black text-emerald-900 font-serif leading-none mb-1">
+                      معهد النداء الإسلامي ٢
+                    </div>
+                    <div className="inline-block bg-slate-900 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                      KELAS {cls.name}
+                    </div>
                   </div>
                 </div>
 
@@ -309,15 +326,32 @@ export default function SchedulePrintView({
                 style={{ pageBreakAfter: "always" }}
               >
                 {/* Kop Guru */}
-                <div className="text-center border-b-2 border-slate-900 pb-4 mb-6">
-                  <h2 className="text-xl font-black uppercase tracking-wider text-slate-900">
-                    JADWAL MENGAJAR GURU
-                  </h2>
-                  <h3 className="text-base font-bold text-slate-700">
-                    TAHUN AJARAN {academicYearName.toUpperCase()}
-                  </h3>
-                  <div className="mt-2 inline-block bg-indigo-900 text-white text-xs font-black px-4 py-1 rounded-full">
-                    {tch.name} — Total: {tch.schedules.length} Jam Pelajaran / Minggu
+                <div className="flex items-center justify-between border-b-2 border-slate-900 pb-3 mb-6">
+                  <div className="flex items-center gap-3">
+                    <img src="/annida-logo.jpg" alt="Logo" className="w-14 h-16 object-contain shrink-0" />
+                    <div className="text-left">
+                      <h4 className="text-[11px] font-bold uppercase tracking-wider text-emerald-800">
+                        YAYASAN ANNIDA AL ISLAMY SETU BEKASI
+                      </h4>
+                      <h2 className="text-base font-black text-slate-900 leading-tight">
+                        PONPES ANNIDA AL ISLAMY 2 SETU BEKASI — SMP ANNIDA
+                      </h2>
+                      <h3 className="text-xs font-bold text-slate-700">
+                        JADWAL MENGAJAR GURU — TAHUN AJARAN {academicYearName.toUpperCase()}
+                      </h3>
+                      <div className="text-[10px] text-slate-500">
+                        Annida Al Islamy 2 Islamic Boarding School • Setu, Bekasi - Jawa Barat
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right flex flex-col items-end">
+                    <div dir="rtl" className="text-lg font-black text-emerald-900 font-serif leading-none mb-1">
+                      معهد النداء الإسلامي ٢
+                    </div>
+                    <div className="inline-block bg-indigo-900 text-white text-xs font-black px-3 py-1 rounded-full uppercase tracking-wider">
+                      {tch.name} ({tch.schedules.length} Jam/Minggu)
+                    </div>
                   </div>
                 </div>
 
