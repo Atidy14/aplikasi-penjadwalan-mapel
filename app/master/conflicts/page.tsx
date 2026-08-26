@@ -227,7 +227,7 @@ export default async function ConflictsPage() {
               Bebas bentrok jadwal guru.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
               {teacherConflicts.map((tc, i) => (
                 <div key={i} className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1">
                   <div className="font-bold text-rose-950">{tc.teacherName}</div>
@@ -269,7 +269,7 @@ export default async function ConflictsPage() {
               Bebas tabrakan kelas.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
               {classCollisions.map((cc, i) => (
                 <div key={i} className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1">
                   <div className="font-bold text-rose-950">{cc.className}</div>
@@ -311,7 +311,7 @@ export default async function ConflictsPage() {
               Seluruh izin guru ditaati 100%.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1.5 custom-scrollbar">
               {constraintViolations.map((cv, i) => (
                 <div key={i} className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs space-y-1">
                   <div className="font-bold text-rose-950">{cv.teacherName}</div>
