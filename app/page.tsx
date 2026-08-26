@@ -18,6 +18,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   // 1. Query data ringkasan modul dari database secara real-time
   const [

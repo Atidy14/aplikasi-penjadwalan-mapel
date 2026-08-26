@@ -23,9 +23,13 @@ export async function runAutoGenerator() {
     const academicYearId = await getActiveAcademicYearId();
     const result = await generateAutomaticSchedule(academicYearId);
     
+    revalidatePath("/master/conflicts");
     revalidatePath("/master/classes");
+    revalidatePath("/master/teaching-load");
+    revalidatePath("/master/teachers");
     revalidatePath("/master/auto-generate");
     revalidatePath("/master/print");
+    revalidatePath("/master/audit");
     revalidatePath("/");
     return result;
   } catch (err: any) {
@@ -44,9 +48,13 @@ export async function runUndoGenerator() {
     const academicYearId = await getActiveAcademicYearId();
     const result = await undoLastScheduleGeneration(academicYearId);
 
+    revalidatePath("/master/conflicts");
     revalidatePath("/master/classes");
+    revalidatePath("/master/teaching-load");
+    revalidatePath("/master/teachers");
     revalidatePath("/master/auto-generate");
     revalidatePath("/master/print");
+    revalidatePath("/master/audit");
     revalidatePath("/");
     return result;
   } catch (err: any) {
