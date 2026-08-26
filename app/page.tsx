@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export default async function Home() {
-  // 1. Query data statistik & master dari database secara real-time
+  // 1. Query data ringkasan modul dari database secara real-time
   const [
     activeYear,
     totalTeachers,
@@ -27,8 +27,6 @@ export default async function Home() {
     totalClasses,
     totalLoads,
     totalSchedules,
-    classGroups,
-    recentAudits,
   ] = await Promise.all([
     prisma.academicYear.findFirst({ where: { isActive: true } }),
     prisma.teacher.count({ where: { status: "ACTIVE" } }),
@@ -36,55 +34,83 @@ export default async function Home() {
     prisma.classGroup.count(),
     prisma.teachingLoad.count(),
     prisma.schedule.count({ where: { validUntil: null } }),
-    prisma.classGroup.findMany({
-      include: {
-        schedules: {
-          where: { validUntil: null },
-        },
-        teachingLoads: true,
-      },
-      orderBy: { name: "asc" },
-    }),
-    prisma.auditLog.findMany({
-      orderBy: { timestamp: "desc" },
-      take: 4,
-    }),
   ]);
 
-  // 2. Hitung progres penyusunan per rombel
-  const rombelProgress = classGroups.map((cls) => {
-    const targetJam = cls.teachingLoads.reduce((sum, tl) => sum + tl.targetPeriods, 0) || 30;
-    const jamTerisi = cls.schedules.length;
-    const persen = Math.min(100, Math.round((jamTerisi / (targetJam || 1)) * 100));
-
-    let status = "Terkunci";
-    let badgeClass = "bg-emerald-50 text-emerald-800 border-emerald-300";
-    let aksiLabel = "Lihat";
-
-    if (jamTerisi === 0) {
-      status = "Kosong";
-      badgeClass = "bg-rose-50 text-rose-800 border-rose-300";
-      aksiLabel = "Susun";
-    } else if (jamTerisi < targetJam) {
-      status = "Draf";
-      badgeClass = "bg-amber-50 text-amber-800 border-amber-300";
-      aksiLabel = "Lanjutkan";
-    }
-
-    return {
-      id: cls.id,
-      nama: cls.name,
-      waliKelas: "Wali Kelas " + cls.name,
-      jamTerisi,
-      targetJam,
-      persen,
-      status,
-      badgeClass,
-      aksiLabel,
-    };
-  });
-
-  const pendingClasses = rombelProgress.filter((r) => r.persen < 100);
+  // 2. Daftar 8 Ringkasan Modul Utama (Persis Format Bersih & Ringkas Mockup)
+  const moduleSummaryCards = [
+    {
+      title: "Auto-Generator Jadwal",
+      subtitle: "Otomasi Jadwal",
+      desc: "Generate jadwal otomatis bebas bentrok",
+      href: "/master/auto-generate",
+      icon: Zap,
+      iconColor: "text-amber-600 bg-amber-50 border-amber-200",
+      accentBar: "bg-amber-500",
+    },
+    {
+      title: "Papan Jadwal Kelas",
+      subtitle: "Kelola Jadwal Kelas",
+      desc: "Lihat & edit jadwal interaktif per rombel",
+      href: "/master/classes",
+      icon: Calendar,
+      iconColor: "text-blue-600 bg-blue-50 border-blue-200",
+      accentBar: "bg-blue-500",
+    },
+    {
+      title: "Kertas Kerja Penugasan",
+      subtitle: "Matriks Beban Mengajar",
+      desc: "Penugasan guru, mata pelajaran & kelas",
+      href: "/master/teaching-load",
+      icon: BookOpen,
+      iconColor: "text-emerald-600 bg-emerald-50 border-emerald-200",
+      accentBar: "bg-emerald-500",
+    },
+    {
+      title: "Kelola Mata Pelajaran",
+      subtitle: "Subjek Kurikulum",
+      desc: "Daftar mapel & target jam mingguan",
+      href: "/master/subjects",
+      icon: GraduationCap,
+      iconColor: "text-rose-600 bg-rose-50 border-rose-200",
+      accentBar: "bg-rose-500",
+    },
+    {
+      title: "Manajemen Guru & Izin",
+      subtitle: "Tenaga Pendidik",
+      desc: "Kelola status aktif & batasan libur guru",
+      href: "/master/teachers",
+      icon: Users,
+      iconColor: "text-purple-600 bg-purple-50 border-purple-200",
+      accentBar: "bg-purple-500",
+    },
+    {
+      title: "Kelola Kelas & Rombel",
+      subtitle: "Struktur Kelas",
+      desc: "Data rombel tingkat VII, VIII, IX / X, XI, XII",
+      href: "/master/classes",
+      icon: School,
+      iconColor: "text-teal-600 bg-teal-50 border-teal-200",
+      accentBar: "bg-teal-500",
+    },
+    {
+      title: "Pusat Deteksi Bentrok",
+      subtitle: "Integritas Jadwal",
+      desc: "Pemantauan zero-conflict & kepatuhan izin",
+      href: "/master/conflicts",
+      icon: ShieldCheck,
+      iconColor: "text-indigo-600 bg-indigo-50 border-indigo-200",
+      accentBar: "bg-indigo-500",
+    },
+    {
+      title: "Laporan & Cetak PDF",
+      subtitle: "Dokumen Resmi",
+      desc: "Cetak format Kop Surat siap tanda tangan",
+      href: "/master/print",
+      icon: FileText,
+      iconColor: "text-cyan-600 bg-cyan-50 border-cyan-200",
+      accentBar: "bg-cyan-500",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[#f7f6f4] text-[#201e1d] flex font-sans antialiased selection:bg-emerald-200">
@@ -92,222 +118,150 @@ export default async function Home() {
       {/* ══ PERSISTENT SIDEBAR FRAME (KIRI) ══ */}
       <PersistentSidebar academicYearName={activeYear?.name || "2026/2027 Ganjil"} />
 
-      {/* ══ AREA KONTEN UTAMA (KANAN - PERSIS MEDIA_1787744155604.PNG) ══ */}
-      <div className="flex-1 min-w-0 overflow-y-auto px-6 sm:px-10 py-8">
+      {/* ══ AREA KONTEN UTAMA RINGKAS (KANAN - PERSIS MEDIA_1787747374142.JPG) ══ */}
+      <div className="flex-1 min-w-0 overflow-y-auto px-6 sm:px-10 py-8 space-y-8">
         
-        {/* Header Kicker, Title & Top Action Buttons */}
-        <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8">
-          <div>
-            <div className="text-[11px] font-bold tracking-widest text-emerald-800 uppercase mb-1 flex items-center gap-1.5">
-              <span className="inline-block w-2.5 h-2.5 bg-emerald-600 rounded-xs"></span>
-              PORTAL TERPADU
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-serif font-bold text-[#201e1d] tracking-tight leading-tight mb-1">
-              Penjadwalan mata pelajaran
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600">
-              T.A. {activeYear?.name || "2026/2027 · Ganjil"} · Yayasan Annida Al Islamy Setu Bekasi (Ponpes Annida Al Islamy 2 • SMP Annida)
-            </p>
+        {/* ══ 1. HEADER UTAMA RINGKAS & ELEGAN ══ */}
+        <div className="text-center sm:text-left space-y-1.5 pb-4 border-b border-slate-300">
+          <div className="text-[11px] font-bold tracking-widest text-emerald-800 uppercase flex items-center justify-center sm:justify-start gap-1.5">
+            <span className="inline-block w-2.5 h-2.5 bg-emerald-600 rounded-xs"></span>
+            PORTAL SUMMARY AKADEMIK & KURIKULUM
           </div>
-
-          <div className="flex items-center gap-3 shrink-0">
-            <Link
-              href="/master/auto-generate"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 rounded-md text-xs sm:text-sm font-semibold shadow-2xs transition"
-            >
-              <Zap className="w-4 h-4 text-slate-700" />
-              Auto-Generator
-            </Link>
-            <Link
-              href="/master/classes"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-md text-xs sm:text-sm font-semibold shadow-2xs transition"
-            >
-              <Calendar className="w-4 h-4" />
-              Buka papan jadwal
-            </Link>
-          </div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black text-slate-900 tracking-tight leading-tight uppercase">
+            Sistem Penjadwalan Pembelajaran
+          </h1>
+          <p className="text-xs sm:text-sm font-semibold text-emerald-900">
+            Yayasan Annida Al Islamy Setu Bekasi • Ponpes Annida Al Islamy 2 • SMP Annida Al Islamy
+          </p>
         </div>
 
-        {/* ══ 4 METRIK STATISTIK BESAR DENGAN IKON DUOTONE ══ */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 py-6 border-y border-slate-300 mb-10">
-          <div>
-            <Users className="w-6 h-6 text-emerald-700 mb-2" />
-            <div className="font-serif font-bold text-4xl sm:text-5xl text-[#201e1d] tracking-tight leading-none">
-              {totalTeachers}
-            </div>
-            <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mt-2">
-              Guru Aktif
-            </div>
-          </div>
-
-          <div>
-            <School className="w-6 h-6 text-emerald-700 mb-2" />
-            <div className="font-serif font-bold text-4xl sm:text-5xl text-[#201e1d] tracking-tight leading-none">
-              {totalClasses}
-            </div>
-            <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mt-2">
-              Rombel Kelas
-            </div>
-          </div>
-
-          <div>
-            <GraduationCap className="w-6 h-6 text-emerald-700 mb-2" />
-            <div className="font-serif font-bold text-4xl sm:text-5xl text-[#201e1d] tracking-tight leading-none">
-              {totalSubjects}
-            </div>
-            <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mt-2">
-              Mata Pelajaran
-            </div>
-          </div>
-
-          <div>
-            <Clock className="w-6 h-6 text-emerald-700 mb-2" />
-            <div className="font-serif font-bold text-4xl sm:text-5xl text-[#201e1d] tracking-tight leading-none">
-              {totalSchedules.toLocaleString("id-ID")}
-            </div>
-            <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase mt-2">
-              Blok Jadwal Aktif
-            </div>
-          </div>
-        </div>
-
-        {/* ══ DUA KOLOM: STATUS ROMBEL (KIRI) & PERLU PERHATIAN / AUDIT (KANAN) ══ */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+        {/* ══ 2. 4 KARTU STATISTIK RINGKASAN BESAR DENGAN CHIP IKON BERWARNA ══ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
-          {/* Kolom Kiri: Status Penyusunan per Rombel */}
-          <div className="lg:col-span-2 space-y-3">
-            <h2 className="text-xs font-bold tracking-wider text-slate-700 uppercase">
-              STATUS PENYUSUNAN PER ROMBEL
-            </h2>
-
-            <div className="bg-white border border-slate-300 rounded-sm shadow-2xs overflow-hidden">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-300 text-slate-500 font-bold uppercase tracking-wider text-[10.5px]">
-                    <th className="px-4 py-3 w-[22%]">Rombel</th>
-                    <th className="px-4 py-3 w-[24%]">Wali Kelas</th>
-                    <th className="px-3 py-3 w-[16%] text-center">Jam Terisi</th>
-                    <th className="px-4 py-3">Progres</th>
-                    <th className="px-3 py-3 w-[18%] text-center">Status</th>
-                    <th className="px-3 py-3 w-[10%] text-right"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200">
-                  {rombelProgress.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
-                        Belum ada data rombel kelas.
-                      </td>
-                    </tr>
-                  ) : (
-                    rombelProgress.map((r) => (
-                      <tr key={r.id} className="hover:bg-slate-50/80 transition">
-                        <td className="px-4 py-3.5 font-bold text-slate-900">
-                          {r.nama}
-                        </td>
-                        <td className="px-4 py-3.5 text-slate-600">
-                          {r.waliKelas}
-                        </td>
-                        <td className="px-3 py-3.5 text-center font-medium text-slate-800">
-                          {r.jamTerisi} / {r.targetJam}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-emerald-600 transition-all duration-300"
-                              style={{ width: `${r.persen}%` }}
-                            ></div>
-                          </div>
-                        </td>
-                        <td className="px-3 py-3.5 text-center">
-                          <span
-                            className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold border ${r.badgeClass}`}
-                          >
-                            {r.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3.5 text-right">
-                          <Link
-                            href={`/master/classes/${r.id}/scheduler`}
-                            className="text-[11px] font-bold text-emerald-800 hover:text-emerald-950 hover:underline"
-                          >
-                            {r.aksiLabel}
-                          </Link>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+          {/* Card 1: Total Guru */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md transition">
+            <div className="w-13 h-13 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-bold shrink-0">
+              <Users className="w-7 h-7" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Total Guru
+              </div>
+              <div className="text-3xl font-black text-slate-900 leading-none mt-1">
+                {totalTeachers}
+              </div>
             </div>
           </div>
 
-          {/* Kolom Kanan: Sidebar Perlu Perhatian & Audit Log */}
-          <aside className="space-y-8">
-            
-            {/* Box 1: Perlu Perhatian */}
-            <div>
-              <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase mb-3 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-pink-700" />
-                PERLU PERHATIAN
-              </h3>
-
-              {pendingClasses.length === 0 ? (
-                <div className="border-l-2 border-emerald-600 pl-3 py-1 text-xs">
-                  <div className="font-bold text-slate-900">Seluruh Kelas Terpenuhi</div>
-                  <p className="text-slate-500 mt-0.5">Semua rombel telah mencapai 100% target jam pelajaran.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {pendingClasses.slice(0, 3).map((pc) => (
-                    <div key={pc.id} className="border-l-2 border-pink-600 pl-3 py-1 text-xs">
-                      <div className="font-bold text-slate-900">
-                        {pc.nama} Belum Lengkap
-                      </div>
-                      <div className="text-slate-500 mt-0.5">
-                        Tersisa {pc.targetJam - pc.jamTerisi} jam kosong yang perlu dijadwalkan.
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          {/* Card 2: Total Kelas */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md transition">
+            <div className="w-13 h-13 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-bold shrink-0">
+              <School className="w-7 h-7" />
             </div>
-
-            {/* Box 2: Audit Log Terakhir */}
             <div>
-              <h3 className="text-xs font-bold tracking-wider text-slate-700 uppercase mb-3 flex items-center gap-1.5">
-                <History className="w-3.5 h-3.5 text-emerald-700" />
-                AUDIT LOG TERAKHIR
-              </h3>
-
-              <div className="space-y-2.5 text-xs">
-                {recentAudits.length === 0 ? (
-                  <p className="text-slate-400">Belum ada aktivitas tercatat.</p>
-                ) : (
-                  recentAudits.map((a) => (
-                    <div key={a.id} className="flex items-start gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 mt-1.5 shrink-0"></span>
-                      <div className="text-slate-700">
-                        <span className="text-slate-400 font-mono text-[10.5px]">
-                          {new Date(a.timestamp).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-                        </span>{" "}
-                        <span className="font-semibold text-slate-900">{a.action}</span> · {a.performedBy}
-                      </div>
-                    </div>
-                  ))
-                )}
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Total Kelas
               </div>
-
-              <Link
-                href="/master/audit"
-                className="text-[11px] font-bold text-emerald-800 hover:underline inline-block mt-3"
-              >
-                Lihat semua
-              </Link>
+              <div className="text-3xl font-black text-slate-900 leading-none mt-1">
+                {totalClasses}
+              </div>
             </div>
+          </div>
 
-          </aside>
+          {/* Card 3: Jadwal Aktif */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md transition">
+            <div className="w-13 h-13 rounded-xl bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold shrink-0">
+              <Clock className="w-7 h-7" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Jadwal Aktif
+              </div>
+              <div className="text-3xl font-black text-slate-900 leading-none mt-1">
+                {totalSchedules.toLocaleString("id-ID")}
+              </div>
+            </div>
+          </div>
 
+          {/* Card 4: Status Bentrok */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4 hover:shadow-md transition">
+            <div className="w-13 h-13 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center font-bold shrink-0">
+              <ShieldCheck className="w-7 h-7" />
+            </div>
+            <div>
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Status Bentrok
+              </div>
+              <div className="text-2xl font-black text-emerald-700 leading-none mt-1">
+                0 Bentrok
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ══ 3. GRID SUMMARY SEMUA MODUL (BERSIH, RAPI, RINGKAS) ══ */}
+        <div className="space-y-4 pt-2">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs font-bold tracking-wider text-slate-700 uppercase">
+              RINGKASAN & AKSES CEPAT MODUL
+            </h2>
+            <span className="text-xs text-slate-500">
+              Tahun Ajaran: <strong className="text-slate-800">{activeYear?.name || "2026/2027 Ganjil"}</strong>
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {moduleSummaryCards.map((card, idx) => {
+              const Icon = card.icon;
+              return (
+                <Link
+                  key={idx}
+                  href={card.href}
+                  className="group bg-white p-5 rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-md transition duration-200 flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-tight">
+                        {card.title}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3.5">
+                      <div
+                        className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 ${card.iconColor}`}
+                      >
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-black text-slate-900 group-hover:text-emerald-800 transition leading-tight">
+                          {card.subtitle}
+                        </h3>
+                        <p className="text-[11px] text-slate-500 leading-tight mt-0.5">
+                          {card.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-700 group-hover:text-emerald-800">
+                    <span>Buka Modul</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition" />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ══ 4. FOOTER INFORMASI RINGKAS ══ */}
+        <div className="pt-6 border-t border-slate-300 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-2">
+          <div>
+            © 2026 Yayasan Annida Al Islamy Setu Bekasi • Ponpes Annida Al Islamy 2 • SMP Annida Al Islamy
+          </div>
+          <div dir="rtl" className="font-serif text-sm font-bold text-emerald-900">
+            معهد النداء الإسلامي ٢
+          </div>
         </div>
 
       </div>
