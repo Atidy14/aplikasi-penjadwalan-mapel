@@ -109,15 +109,17 @@ def create_manual_book():
     toc_items = [
         ("BAB 1: PENGENALAN & ARSITEKTUR SISTEM", "Latar belakang, arsitektur Next.js & Prisma, keunggulan fitur."),
         ("BAB 2: ALUR KERJA STANDAR (END-TO-END WORKFLOW)", "Diagram alir 5 tahap penyusunan jadwal sekolah bebas bentrok."),
-        ("BAB 3: PANDUAN BERANDA & PORTAL LAYANAN UTAMA", "Navigasi antarmuka portal terpadu ala portal publik BPJS."),
+        ("BAB 3: PANDUAN BERANDA & PORTAL LAYANAN UTAMA", "Navigasi antarmuka portal terpadu Broadsheet & Identitas Yayasan Annida Al Islamy."),
         ("BAB 4: PENGELOLAAN DATA MASTER", "Modul Guru, Mata Pelajaran, dan Struktur Rombel Kelas (X, XI, XII)."),
-        ("BAB 5: PENGATURAN KETERSEDIAAN & REQUEST IZIN GURU", "Konfigurasi Teacher Constraints (kalender hari/jam libur guru)."),
+        ("BAB 5: PENGATURAN KETERSEDIAAN & REQUEST IZIN GURU", "Konfigurasi Teacher Constraints & Studi Kasus Penguncian Hari/Kelas Persisten."),
         ("BAB 6: PENYUSUNAN KERTAS KERJA (TEACHING LOAD)", "Matriks penugasan guru, mapel, kelas, dan alokasi jam/minggu."),
         ("BAB 7: EKSEKUSI AUTO-GENERATOR JADWAL CERDAS", "Algoritma Greedy Heuristic, pencarian slot otomatis, dan laporan."),
         ("BAB 8: PAPAN PENJADWALAN KELAS & VALIDASI INTERAKTIF", "Grid jadwal Senin-Sabtu, jam istirahat, validasi bentrok, progress target."),
         ("BAB 9: PROSEDUR SERAH TERIMA GURU (TEACHER HANDOVER)", "Mutasi guru di tengah semester dengan soft-delete & tracking historis."),
-        ("BAB 10: AUDIT LOG & PENGAWASAN AKTIVITAS SISTEM", "Pencatatan rekam jejak mutasi jadwal dan aktvitas auto-generator."),
-        ("BAB 11: PANDUAN TEKNIS & TROUBLESHOOTING ADMINISTRATOR", "Tips pemeliharaan database, ganti tahun ajaran, dan solusi kendala.")
+        ("BAB 10: AUDIT LOG & PENGAWASAN AKTIVITAS SISTEM", "Pencatatan rekam jejak mutasi jadwal dan aktivitas auto-generator."),
+        ("BAB 11: PUSAT DETEKSI BENTROK (CONFLICT CENTER)", "Pemindaian diagnostik real-time bentrok guru, kelas, dan kepatuhan izin."),
+        ("BAB 12: PANDUAN TEKNIS & TROUBLESHOOTING ADMINISTRATOR", "Tips pemeliharaan database, ganti tahun ajaran, dan solusi kendala."),
+        ("BAB 13: PENGUJIAN OTOMATIS & KEPATUHAN AUDITOR CISA", "Pengujian 8 kontrol audit standar ISACA ITAF dan ISO/IEC 25010 (100% PASS).")
     ]
 
     t_toc = doc.add_table(rows=len(toc_items) + 1, cols=2)
@@ -338,6 +340,39 @@ def create_manual_book():
 
     add_callout("Algoritma Auto-Generator secara otomatis membaca daftar larangan ini dan tidak akan pernah menempatkan jadwal guru tersebut di jam yang telah diblokir merah.", "SUCCESS")
 
+    add_section_header("5.2 Studi Kasus & Alur Kerja: Guru Khusus Hari Tertentu & Kelas Tertentu")
+    p_sc_desc = doc.add_paragraph("Bagaimana jika ada guru yang memiliki permintaan khusus, misalnya: 'Hanya bisa mengajar di hari Sabtu saja dan hanya pada 3 rombel kelas tertentu'? Sistem mengakomodasi skenario ini secara persisten melalui kolaborasi 2 modul utama:")
+    
+    t_mod = doc.add_table(rows=3, cols=3)
+    t_mod.alignment = WD_TABLE_ALIGNMENT.CENTER
+    t_mod.cell(0, 0).paragraphs[0].add_run("Modul Terkait").font.bold = True
+    t_mod.cell(0, 1).paragraphs[0].add_run("Konfigurasi yang Dilakukan").font.bold = True
+    t_mod.cell(0, 2).paragraphs[0].add_run("Jaminan Sistem (Output)").font.bold = True
+    set_cell_background(t_mod.cell(0, 0), "10B981")
+    set_cell_background(t_mod.cell(0, 1), "10B981")
+    set_cell_background(t_mod.cell(0, 2), "10B981")
+    for c in range(3):
+        t_mod.cell(0, c).paragraphs[0].runs[0].font.color.rgb = RGBColor(255, 255, 255)
+
+    row1 = t_mod.rows[1].cells
+    row1[0].paragraphs[0].add_run("1. Modul Kertas Kerja\n(/master/teaching-load)").font.bold = True
+    row1[1].paragraphs[0].add_run("Daftarkan penugasan guru tersebut HANYA pada 3 kelas yang ditentukan (misal: VII-A, VII-B, VII-C @2 jam).")
+    row1[2].paragraphs[0].add_run("Guru TIDAK AKAN PERNAH dijadwalkan di kelas lain selain 3 kelas pilihan ini.")
+
+    row2 = t_mod.rows[2].cells
+    row2[0].paragraphs[0].add_run("2. Modul Izin Guru\n(/master/teachers -> Constraint)").font.bold = True
+    row2[1].paragraphs[0].add_run("Kunci/blokir hari Senin s.d. Jumat (Warna MERAH [X]). Biarkan hari Sabtu KOSONG (Warna HIJAU [✓]).")
+    row2[2].paragraphs[0].add_run("Algoritma secara matematis TERKUNCI hanya menempatkan jam mengajar guru di hari Sabtu.")
+
+    for r_idx in [1, 2]:
+        for c_idx in range(3):
+            set_cell_margins(t_mod.rows[r_idx].cells[c_idx], top=80, bottom=80, left=100, right=100)
+
+    p_sc_res = doc.add_paragraph()
+    p_sc_res.paragraph_format.space_before = Pt(8)
+    p_sc_res.add_run("Hasil Eksekusi Auto-Generator: ").font.bold = True
+    p_sc_res.add_run("Ketika tombol 'Mulai Auto-Generate' ditekan, sistem otomatis menempatkan seluruh 6 jam mengajar guru tersebut secara persisten hanya pada hari Sabtu, terbagi rapi pada 3 kelas target (misal: VII-A jam 1-2, VII-B jam 3-4, VII-C jam 5-6) dengan 0 bentrok!")
+
     # ==========================================
     # BAB 6: PENYUSUNAN KERTAS KERJA
     # ==========================================
@@ -432,9 +467,29 @@ def create_manual_book():
     p_log = doc.add_paragraph("Setiap baris log menampilkan: Jenis Tindakan (Action Badge), Pelaksana (Performed By), Tanggal & Jam Kejadian (WIB), serta rincian detail peristiwa dalam bahasa yang mudah dipahami.")
 
     # ==========================================
-    # BAB 11: PANDUAN TEKNIS & TROUBLESHOOTING
+    # BAB 11: PUSAT DETEKSI BENTROK (CONFLICT CENTER)
     # ==========================================
-    add_chapter_header(11, "Panduan Teknis & Troubleshooting Administrator")
+    add_chapter_header(11, "Pusat Deteksi Bentrok (Conflict Center)")
+    p = doc.add_paragraph("Pusat Deteksi Bentrok (`/master/conflicts`) berfungsi sebagai modul Quality Control & Pre-Flight Check sebelum jadwal resmi dicetak dan disahkan oleh pimpinan. Sistem secara instan memindai 3 potensi pelanggaran:")
+
+    conflict_items = [
+        ("Multi-Booking Guru", "Mendeteksi jika seorang guru terjadwal di 2 kelas berbeda pada hari dan jam yang sama."),
+        ("Tabrakan Kelas", "Mendeteksi jika satu rombel kelas memiliki 2 mata pelajaran di jam yang sama."),
+        ("Pelanggaran Izin Guru", "Mendeteksi jika ada jadwal yang melanggar permohonan libur/izin guru.")
+    ]
+    for c_name, c_exp in conflict_items:
+        p_ci = doc.add_paragraph(style='List Bullet')
+        p_ci.paragraph_format.space_after = Pt(3)
+        r_ci = p_ci.add_run(f"{c_name}: ")
+        r_ci.font.bold = True
+        p_ci.add_run(c_exp)
+
+    add_callout("Jika seluruh jadwal bersih, halaman ini menampilkan lencana hijau 'Zero Conflict • 100% Bersih', menandakan jadwal siap dicetak ke format PDF resmi.", "SUCCESS")
+
+    # ==========================================
+    # BAB 12: PANDUAN TEKNIS & TROUBLESHOOTING
+    # ==========================================
+    add_chapter_header(12, "Panduan Teknis & Troubleshooting Administrator")
     
     faq_items = [
         ("Bagaimana cara mengganti ke Tahun Ajaran Baru?", "Di database tabel `AcademicYear`, buat record baru (misal: '2027/2028 Ganjil') dan set `isActive: true`. Buat kelas-kelas baru untuk tahun tersebut, susun Kertas Kerja, lalu jalankan Auto-Generator. Jadwal tahun lama tetap aman tersimpan."),
@@ -457,12 +512,12 @@ def create_manual_book():
         r_a.font.color.rgb = RGBColor(51, 65, 85)
 
     # ==========================================
-    # BAB 12: PENGUJIAN KEPATUHAN AUDITOR CISA
+    # BAB 13: PENGUJIAN KEPATUHAN AUDITOR CISA
     # ==========================================
-    add_chapter_header(12, "Pengujian Otomatis & Kepatuhan Standar Auditor CISA")
+    add_chapter_header(13, "Pengujian Otomatis & Kepatuhan Standar Auditor CISA")
     p = doc.add_paragraph("Sistem SIP-MAPEL v2.0 Pro telah dilengkapi suite pengujian otomatis (Automated Unit Testing) yang dirancang sesuai standar ISACA ITAF (IT Assurance Framework) dan ISO/IEC 25010 Software Quality Model.")
 
-    add_section_header("12.1 Kontrol Audit yang Diverifikasi (100% PASS):")
+    add_section_header("13.1 Kontrol Audit yang Diverifikasi (100% PASS):")
     cisa_controls = [
         ("AC-1.1 Data Integrity (Teacher Multi-Booking)", "Memastikan zero-conflict: tidak ada guru mengajar di 2 kelas pada jam yang sama."),
         ("AC-1.2 Data Integrity (Class Collision)", "Memastikan zero-collision: tidak ada kelas memiliki 2 mapel bersamaan di ruangan yang sama."),
