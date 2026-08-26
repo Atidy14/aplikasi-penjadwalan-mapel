@@ -64,6 +64,12 @@ export default function MasterLayout({
               ⚡ Auto-Generate
             </Link>
             <Link
+              href="/master/conflicts"
+              className="px-3 py-1.5 rounded-md text-xs font-medium text-teal-300 hover:text-white hover:bg-slate-800 transition"
+            >
+              🛡️ Pusat Bentrok
+            </Link>
+            <Link
               href="/master/print"
               className="px-3 py-1.5 rounded-md text-xs font-medium text-emerald-300 hover:text-white hover:bg-slate-800 transition"
             >

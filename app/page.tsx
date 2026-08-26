@@ -14,10 +14,13 @@ import {
   AlertCircle,
   Sparkles,
   ShieldCheck,
+  AlertTriangle,
+  FileText,
+  SlidersHorizontal,
 } from "lucide-react";
 
 export default async function Home() {
-  // Query data statistik dari database secara real-time
+  // 1. Query data statistik & master dari database secara real-time
   const [
     activeYear,
     totalTeachers,
@@ -25,6 +28,8 @@ export default async function Home() {
     totalClasses,
     totalLoads,
     totalSchedules,
+    classGroups,
+    recentAudits,
   ] = await Promise.all([
     prisma.academicYear.findFirst({ where: { isActive: true } }),
     prisma.teacher.count({ where: { status: "ACTIVE" } }),
@@ -32,7 +37,61 @@ export default async function Home() {
     prisma.classGroup.count(),
     prisma.teachingLoad.count(),
     prisma.schedule.count({ where: { validUntil: null } }),
+    prisma.classGroup.findMany({
+      include: {
+        schedules: {
+          where: { validUntil: null },
+        },
+        teachingLoads: true,
+      },
+      orderBy: { name: "asc" },
+    }),
+    prisma.auditLog.findMany({
+      orderBy: { timestamp: "desc" },
+      take: 4,
+    }),
   ]);
+
+  // 2. Hitung progres penyusunan per rombel
+  const rombelProgress = classGroups.map((cls) => {
+    const targetJam = cls.teachingLoads.reduce((sum, tl) => sum + tl.targetPeriods, 0) || 30;
+    const jamTerisi = cls.schedules.length;
+    const persen = Math.min(100, Math.round((jamTerisi / (targetJam || 1)) * 100));
+
+    let status = "Lengkap";
+    let badgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+    let barColor = "bg-emerald-500";
+
+    if (jamTerisi === 0) {
+      status = "Belum Terjadwal";
+      badgeClass = "bg-rose-100 text-rose-800 border-rose-200";
+      barColor = "bg-rose-500";
+    } else if (jamTerisi < targetJam) {
+      status = `Kurang ${targetJam - jamTerisi} Jam`;
+      badgeClass = "bg-amber-100 text-amber-800 border-amber-200";
+      barColor = "bg-amber-500";
+    } else if (jamTerisi > targetJam) {
+      status = `Lebih ${jamTerisi - targetJam} Jam`;
+      badgeClass = "bg-purple-100 text-purple-800 border-purple-200";
+      barColor = "bg-purple-500";
+    }
+
+    return {
+      id: cls.id,
+      nama: cls.name,
+      waliKelas: "Wali Kelas " + cls.name,
+      jamTerisi,
+      targetJam,
+      persen,
+      status,
+      badgeClass,
+      barColor,
+    };
+  });
+
+  // 3. Deteksi Peringatan Perlu Perhatian
+  const pendingClasses = rombelProgress.filter((r) => r.persen < 100);
+  const totalWarnings = pendingClasses.length;
 
   const menuItems = [
     {
@@ -84,39 +143,39 @@ export default async function Home() {
       highlight: false,
     },
     {
-      title: "Mata Pelajaran",
-      category: "Kurikulum",
-      desc: "Daftar mata pelajaran beserta target jam pelajaran standar per minggu.",
-      href: "/master/subjects",
-      icon: GraduationCap,
-      badge: `${totalSubjects} Mapel`,
+      title: "Pusat Deteksi Bentrok",
+      category: "Validasi Mutlak",
+      desc: "Periksa dan pantau integritas jadwal dari potensi bentrok jam guru & ruang kelas.",
+      href: "/master/conflicts",
+      icon: ShieldCheck,
+      badge: "Zero Conflict",
+      badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
+      color: "from-teal-600 to-emerald-700",
+      iconBg: "bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white",
+      highlight: false,
+    },
+    {
+      title: "Cetak & Ekspor PDF",
+      category: "Dokumen Resmi",
+      desc: "Cetak lembar jadwal resmi per kelas atau per guru lengkap dengan kop surat dan kolom tanda tangan.",
+      href: "/master/print",
+      icon: FileText,
+      badge: "Siap Cetak",
       badgeColor: "bg-cyan-100 text-cyan-800 border-cyan-200",
       color: "from-cyan-600 to-blue-700",
       iconBg: "bg-cyan-50 text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white",
       highlight: false,
     },
     {
-      title: "Struktur Kelas",
-      category: "Rombongan Belajar",
-      desc: "Kelola kelas tingkat X, XI, dan XII yang dibuka pada tahun ajaran aktif.",
-      href: "/master/classes",
-      icon: School,
-      badge: `${totalClasses} Rombel`,
-      badgeColor: "bg-rose-100 text-rose-800 border-rose-200",
-      color: "from-rose-600 to-pink-700",
-      iconBg: "bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white",
-      highlight: false,
-    },
-    {
-      title: "Serah Terima Guru",
-      category: "Turnover Staf",
-      desc: "Pindahkan seluruh jadwal mengajar antar-guru secara historis tanpa kehilangan data.",
-      href: "/master/teachers",
-      icon: ShieldCheck,
-      badge: "Soft-Transfer",
-      badgeColor: "bg-teal-100 text-teal-800 border-teal-200",
-      color: "from-teal-600 to-emerald-700",
-      iconBg: "bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white",
+      title: "Mata Pelajaran",
+      category: "Kurikulum",
+      desc: "Daftar mata pelajaran beserta target jam pelajaran standar per minggu.",
+      href: "/master/subjects",
+      icon: GraduationCap,
+      badge: `${totalSubjects} Mapel`,
+      badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+      color: "from-amber-600 to-orange-700",
+      iconBg: "bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white",
       highlight: false,
     },
     {
@@ -257,10 +316,18 @@ export default async function Home() {
                   Kertas Kerja Penugasan
                 </Link>
                 <Link
+                  href="/master/conflicts"
+                  className="inline-flex items-center gap-2 bg-teal-900/60 hover:bg-teal-900 text-teal-100 border border-teal-700/60 font-semibold px-5 py-3 rounded-xl backdrop-blur-sm transition text-xs sm:text-sm"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  Pusat Bentrok
+                </Link>
+                <Link
                   href="/master/print"
                   className="inline-flex items-center gap-2 bg-emerald-800/60 hover:bg-emerald-800 text-emerald-100 border border-emerald-700/60 font-semibold px-5 py-3 rounded-xl backdrop-blur-sm transition text-xs sm:text-sm"
                 >
-                  🖨️ Cetak Rekap PDF
+                  <FileText className="w-4 h-4" />
+                  Cetak Rekap PDF
                 </Link>
               </div>
             </div>
@@ -327,8 +394,183 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ============================================================ */}
+      {/* SECTION BARU (DARI PROTOTYPE CLAUDE): STATUS ROMBEL & PANEL AUDIT */}
+      {/* ============================================================ */}
+      <section className="max-w-7xl mx-auto px-6 pt-14 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          
+          {/* Kolom Kiri: Tabel Status Penyusunan per Rombel (2 Kolom) */}
+          <div className="lg:col-span-2 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">
+                  Status Penyusunan Jadwal per Rombel
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Monitoring keterpenuhan jam pelajaran per kelas terhadap target Kertas Kerja.
+                </p>
+              </div>
+              <Link
+                href="/master/classes"
+                className="text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1"
+              >
+                Lihat Semua Kelas <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-xs overflow-hidden">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                  <tr>
+                    <th className="px-5 py-3.5">Rombel</th>
+                    <th className="px-4 py-3.5 text-center">Jam Terisi</th>
+                    <th className="px-4 py-3.5">Progres Keterpenuhan</th>
+                    <th className="px-4 py-3.5 text-center">Status</th>
+                    <th className="px-4 py-3.5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {rombelProgress.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-5 py-8 text-center text-slate-400">
+                        Belum ada kelas yang terdaftar.
+                      </td>
+                    </tr>
+                  ) : (
+                    rombelProgress.map((r) => (
+                      <tr key={r.id} className="hover:bg-slate-50/80 transition">
+                        <td className="px-5 py-3.5 font-bold text-slate-900">
+                          {r.nama}
+                        </td>
+                        <td className="px-4 py-3.5 text-center font-semibold text-slate-700">
+                          {r.jamTerisi} / {r.targetJam} jam
+                        </td>
+                        <td className="px-4 py-3.5">
+                          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${r.barColor} transition-all duration-500`}
+                              style={{ width: `${r.persen}%` }}
+                            ></div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3.5 text-center">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold border ${r.badgeClass}`}
+                          >
+                            {r.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 text-right">
+                          <Link
+                            href={`/master/classes/${r.id}/scheduler`}
+                            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-900 px-2 py-1 rounded-md hover:bg-emerald-50 transition"
+                          >
+                            Buka Papan <ArrowRight className="w-3 h-3" />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Kolom Kanan: Panel Perlu Perhatian & Feed Audit (1 Kolom) */}
+          <div className="space-y-6">
+            
+            {/* Box 1: Perlu Perhatian */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-slate-900 font-bold text-sm">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <span>Perlu Perhatian</span>
+                {totalWarnings > 0 && (
+                  <span className="ml-auto text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">
+                    {totalWarnings} Kelas
+                  </span>
+                )}
+              </div>
+
+              {totalWarnings === 0 ? (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Seluruh kelas telah 100% lengkap terjadwal!</span>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {pendingClasses.slice(0, 3).map((pc) => (
+                    <div
+                      key={pc.id}
+                      className="p-2.5 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-slate-700 flex justify-between items-center"
+                    >
+                      <div>
+                        <strong className="text-slate-900">{pc.nama}</strong>
+                        <p className="text-[11px] text-amber-800">
+                          Masih tersisa {pc.targetJam - pc.jamTerisi} jam kosong.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/master/classes/${pc.id}/scheduler`}
+                        className="text-[11px] font-bold text-amber-900 underline"
+                      >
+                        Lengkapi
+                      </Link>
+                    </div>
+                  ))}
+                  {totalWarnings > 3 && (
+                    <p className="text-[11px] text-slate-400 text-center pt-1">
+                      + {totalWarnings - 3} kelas lainnya memerlukan pengisian.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Box 2: Feed Audit Log Terakhir */}
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+              <div className="flex items-center justify-between text-slate-900 font-bold text-sm">
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-indigo-600" />
+                  <span>Aktivitas Sistem Terakhir</span>
+                </div>
+                <Link
+                  href="/master/audit"
+                  className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800"
+                >
+                  Lihat Semua
+                </Link>
+              </div>
+
+              <div className="space-y-2.5">
+                {recentAudits.length === 0 ? (
+                  <p className="text-xs text-slate-400">Belum ada aktivitas tercatat.</p>
+                ) : (
+                  recentAudits.map((a) => (
+                    <div key={a.id} className="text-xs flex items-start gap-2 border-b border-slate-100 pb-2 last:border-none last:pb-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                      <div>
+                        <span className="font-bold text-slate-800">{a.action}</span>
+                        <p className="text-[10px] text-slate-400">
+                          {new Date(a.timestamp).toLocaleString("id-ID", {
+                            dateStyle: "short",
+                            timeStyle: "short",
+                          })} • oleh {a.performedBy}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
       {/* Grid Menu Portal (8 Layanan Utama) */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section className="max-w-7xl mx-auto px-6 py-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-wider mb-1">

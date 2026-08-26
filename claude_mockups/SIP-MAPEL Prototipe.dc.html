@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="_ds/broadsheet-377fdc6a-c24e-432c-926b-b1df1963c0e3/styles.css">
+<script src="_ds/broadsheet-377fdc6a-c24e-432c-926b-b1df1963c0e3/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<style>
+:root{
+  --color-accent:#0f8a4d;
+  --color-accent-100:#e3f3e9;--color-accent-200:#c3e6d2;--color-accent-300:#95d4b0;
+  --color-accent-400:#55ba85;--color-accent-500:#0f8a4d;--color-accent-600:#0c7a44;
+  --color-accent-700:#0a6a3b;--color-accent-800:#075430;--color-accent-900:#053e24;
+}
+body{margin:0;background:var(--color-bg)}
+a{color:var(--color-accent-700)}
+a:hover{color:var(--color-accent-800)}
+i[class*="ph-"]{line-height:1;flex:none}
+</style></helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;--pad:{{ pad }};--gap:{{ gapv }}">
+
+  <sc-if value="{{ navAtas }}" hint-placeholder-val="{{ true }}">
+    <div style="padding:14px 34px 10px;display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em;display:flex;align-items:center;gap:9px"><i class="ph-duotone ph-calendar-check" style="font-size:23px;color:var(--color-accent)"></i>SIP<span style="color:var(--color-accent)">·</span>MAPEL</div>
+      <nav style="display:flex;gap:19px;font-size:13.5px;flex-wrap:wrap">
+        <sc-for list="{{ menu }}" as="m" hint-placeholder-count="7">
+          <a href="#" onClick="{{ m.buka }}" style="text-decoration:none;color:{{ m.warna }};font-weight:{{ m.bobot }};display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone {{ m.ikon }}" style="font-size:16px"></i>{{ m.label }}</a>
+        </sc-for>
+      </nav>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;opacity:.62">
+        <span>{{ tahunAjaran }}</span>
+        <span style="width:1px;height:13px;background:currentColor;opacity:.35"></span>
+        <span>{{ namaPengguna }}</span>
+      </div>
+    </div>
+    <div style="height:3px;background:var(--color-text);margin:0 34px"></div>
+    <div style="height:1px;background:var(--color-text);margin:2px 34px 0"></div>
+  </sc-if>
+
+  <div style="flex:1;display:flex;align-items:stretch">
+
+    <sc-if value="{{ navSamping }}" hint-placeholder-val="{{ true }}">
+      <aside style="flex:none;width:224px;padding:20px 0 30px 26px;display:flex;flex-direction:column;gap:26px;border-right:1px solid var(--color-divider)">
+        <div>
+          <div style="font:600 18px/1 var(--font-heading);letter-spacing:-.02em;display:flex;align-items:center;gap:9px"><i class="ph-duotone ph-calendar-check" style="font-size:22px;color:var(--color-accent)"></i>SIP<span style="color:var(--color-accent)">·</span>MAPEL</div>
+          <div style="font-size:11px;opacity:.5;margin-top:5px">{{ tahunAjaran }}</div>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:1px;padding-right:22px">
+          <sc-for list="{{ menu }}" as="m" hint-placeholder-count="7">
+            <a href="#" onClick="{{ m.buka }}" style="text-decoration:none;font-size:13.5px;padding:7px 9px;margin-left:-9px;border-radius:var(--radius-md);color:{{ m.warna }};font-weight:{{ m.bobot }};background:{{ m.latar }};display:flex;align-items:center;gap:9px"><i class="ph-duotone {{ m.ikon }}" style="font-size:17px"></i>{{ m.label }}</a>
+          </sc-for>
+        </nav>
+        <div style="margin-top:auto;padding-right:22px;font-size:11.5px;opacity:.55;line-height:1.5">{{ namaPengguna }}</div>
+      </aside>
+    </sc-if>
+
+    <main style="flex:1;min-width:0;padding:26px 34px 40px">
+
+      <!-- ══ BERANDA ══ -->
+      <sc-if value="{{ diBeranda }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:28px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-squares-four" style="font-size:16px"></i>Portal terpadu</div>
+            <h1 style="font-size:38px;margin:0 0 5px;letter-spacing:-.025em">Penjadwalan mata pelajaran</h1>
+            <p style="margin:0;font-size:14px;opacity:.62">{{ tahunAjaran }} · batas kunci jadwal 12 Juli 2026</p>
+          </div>
+          <sc-if value="{{ bisaUbah }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-secondary" type="button" onClick="{{ keGenerate }}" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-lightning" style="font-size:17px"></i>Auto-Generator</button>
+              <button class="btn btn-primary" type="button" onClick="{{ kePapan }}" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-calendar-dots" style="font-size:17px"></i>Buka papan jadwal</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);margin-bottom:38px">
+          <sc-for list="{{ statistik }}" as="s" hint-placeholder-count="4">
+            <div style="padding:0 22px;border-left:1px solid var(--color-divider)">
+              <i class="ph-duotone {{ s.ikon }}" style="font-size:24px;color:var(--color-accent);display:block;margin-bottom:11px"></i>
+              <div style="font:600 44px/1 var(--font-heading);letter-spacing:-.03em;color:{{ s.warna }}">{{ s.angka }}</div>
+              <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:7px">{{ s.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 330px;gap:44px;align-items:start">
+          <div>
+            <h6 style="margin:0 0 4px">Status penyusunan per rombel</h6>
+            <table class="table">
+              <thead><tr><th style="width:19%">Rombel</th><th style="width:17%">Wali kelas</th><th style="width:13%">Jam terisi</th><th>Progres</th><th style="width:17%">Status</th><th style="width:9%"></th></tr></thead>
+              <tbody>
+                <sc-for list="{{ rombelList }}" as="r" hint-placeholder-count="6">
+                  <tr>
+                    <td style="font-weight:600">{{ r.nama }}</td>
+                    <td>{{ r.wali }}</td>
+                    <td>{{ r.jam }}</td>
+                    <td><div style="height:6px;background:var(--color-neutral-200)"><div style="height:6px;width:{{ r.persen }};background:{{ r.bar }}"></div></div></td>
+                    <td><span class="{{ r.tagClass }}">{{ r.status }}</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost" type="button" onClick="{{ kePapan }}">{{ r.aksi }}</button></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <aside style="display:flex;flex-direction:column;gap:30px">
+            <div>
+              <h6 style="margin:0 0 12px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-bell-ringing" style="font-size:18px;color:var(--color-accent-2)"></i>Perlu perhatian</h6>
+              <div style="display:flex;flex-direction:column;gap:15px">
+                <sc-for list="{{ peringatan }}" as="p" hint-placeholder-count="3">
+                  <div style="border-left:2px solid {{ p.warna }};padding-left:13px;display:flex;gap:10px">
+                    <i class="ph-duotone {{ p.ikon }}" style="font-size:19px;color:{{ p.warna }};margin-top:1px"></i>
+                    <div>
+                      <div style="font:600 14px/1.35 var(--font-heading)">{{ p.judul }}</div>
+                      <div style="font-size:11.5px;opacity:.6;margin-top:3px">{{ p.detail }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <h6 style="margin:0 0 12px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-clock-counter-clockwise" style="font-size:18px;color:var(--color-accent)"></i>Audit log terakhir</h6>
+              <div style="display:flex;flex-direction:column;gap:11px;font-size:12.5px">
+                <sc-for list="{{ auditRingkas }}" as="a" hint-placeholder-count="4">
+                  <div style="display:flex;gap:9px;align-items:flex-start"><i class="ph-duotone {{ a.ikon }}" style="font-size:16px;opacity:.6;margin-top:1px"></i><span><span style="opacity:.45">{{ a.waktu }}</span> &nbsp;{{ a.teks }}</span></div>
+                </sc-for>
+              </div>
+              <button class="btn btn-ghost" type="button" onClick="{{ keAudit }}" style="margin-top:10px;margin-left:-5px">Lihat semua</button>
+            </div>
+          </aside>
+        </div>
+      </sc-if>
+
+      <!-- ══ PAPAN PENJADWALAN ══ -->
+      <sc-if value="{{ diPapan }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:20px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-calendar-dots" style="font-size:16px"></i>Papan penjadwalan kelas</div>
+            <h1 style="font-size:32px;margin:0 0 4px;letter-spacing:-.025em">XI RPL 1</h1>
+            <p style="margin:0;font-size:13px;opacity:.6">36 siswa · wali kelas Sinta Wulandari · 8 jam × 40 menit, mulai 07.00</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="seg">
+              <sc-for list="{{ layoutPilihan }}" as="l" hint-placeholder-count="3">
+                <label class="seg-opt" style="background:{{ l.latar }};color:{{ l.warna }}"><input type="radio" name="layoutjadwal" checked="{{ l.aktif }}" onChange="{{ l.pilih }}" style="position:absolute;opacity:0;width:0">{{ l.label }}</label>
+              </sc-for>
+            </div>
+            <button class="btn btn-secondary" type="button" onClick="{{ keLaporan }}" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-file-arrow-down" style="font-size:17px"></i>Ekspor</button>
+            <sc-if value="{{ bisaUbah }}" hint-placeholder-val="{{ true }}">
+              <button class="btn btn-primary" type="button" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-lock-simple" style="font-size:17px"></i>Simpan &amp; kunci</button>
+            </sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ bentrokDiAtas }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-bottom:18px;padding:11px 16px;background:var(--color-accent-2-100);display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <i class="ph-duotone ph-warning-diamond" style="font-size:19px;color:var(--color-accent-2-700)"></i>
+            <span style="font:600 13.5px/1.3 var(--font-heading);color:var(--color-accent-2-800)">3 bentrok di rombel ini</span>
+            <span style="font-size:12.5px;color:var(--color-accent-2-800);opacity:.85">Bagas Prakoso ganda Selasa Jam 7–8 · Lab RPL 1 ganda Kamis Jam 1–2</span>
+            <button class="btn btn-ghost" type="button" onClick="{{ keBentrok }}" style="margin-left:auto;color:var(--color-accent-2-700)">Buka pusat bentrok</button>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:1fr {{ lebarPanel }};gap:30px;align-items:start">
+          <div>
+            <!-- layout: matriks -->
+            <sc-if value="{{ layoutMatriks }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:88px repeat(6,1fr);font-size:11px;letter-spacing:.07em;text-transform:uppercase;opacity:.55;padding-bottom:7px;border-bottom:1px solid var(--color-text)">
+                <div>Jam</div>
+                <sc-for list="{{ hariLabel }}" as="h" hint-placeholder-count="6">
+                  <div style="padding-left:9px">{{ h }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ baris }}" as="b" hint-placeholder-count="9">
+                <sc-if value="{{ b.istirahat }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:5px 9px;background:var(--color-neutral-100);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.5;text-align:center">Istirahat · 09.40–10.00</div>
+                </sc-if>
+                <sc-if value="{{ b.kbm }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:88px repeat(6,1fr);border-bottom:1px solid color-mix(in srgb,var(--color-text) 8%,transparent)">
+                    <div style="padding:var(--pad) 0;font-size:11px;opacity:.55;line-height:1.4">Jam {{ b.jam }}<br>{{ b.waktu }}</div>
+                    <sc-for list="{{ b.sel }}" as="c" hint-placeholder-count="6">
+                      <div onClick="{{ c.klik }}" style="padding:var(--pad) 9px;cursor:pointer;background:{{ c.latar }};box-shadow:{{ c.garis }};border-left:1px solid color-mix(in srgb,var(--color-text) 8%,transparent);min-height:{{ tinggiSel }}">
+                        <div style="font:600 12.5px/1.25 var(--font-heading);color:{{ c.warnaJudul }}">{{ c.mapel }}</div>
+                        <div style="font-size:10.5px;opacity:.58;margin-top:3px;display:flex;align-items:center;gap:5px"><i class="ph-duotone {{ c.ikonGuru }}" style="font-size:13px"></i>{{ c.guru }}</div>
+                        <div style="font-size:10.5px;opacity:.58;display:flex;align-items:center;gap:5px"><i class="ph-duotone {{ c.ikonRuang }}" style="font-size:13px"></i>{{ c.ruang }}</div>
+                        <div style="margin-top:5px"><span class="{{ c.tagClass }}" style="font-size:9.5px;padding:2px 6px">{{ c.tag }}</span></div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </sc-if>
+
+            <!-- layout: agenda harian -->
+            <sc-if value="{{ layoutAgenda }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px 34px">
+                <sc-for list="{{ agenda }}" as="h" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;align-items:baseline;gap:9px;padding-bottom:7px;border-bottom:1px solid var(--color-text)">
+                      <span style="font:600 16px/1 var(--font-heading)">{{ h.hari }}</span>
+                      <span style="font-size:11px;opacity:.5">{{ h.ringkas }}</span>
+                    </div>
+                    <sc-for list="{{ h.sel }}" as="c" hint-placeholder-count="8">
+                      <div onClick="{{ c.klik }}" style="display:grid;grid-template-columns:54px 1fr;gap:12px;padding:9px 0;border-bottom:1px solid color-mix(in srgb,var(--color-text) 7%,transparent);cursor:pointer;background:{{ c.latar }};box-shadow:{{ c.garis }}">
+                        <div style="font-size:10.5px;opacity:.5;line-height:1.4">Jam {{ c.jam }}<br>{{ c.mulai }}</div>
+                        <div>
+                          <div style="font:600 12.5px/1.25 var(--font-heading);color:{{ c.warnaJudul }}">{{ c.mapel }}</div>
+                          <div style="font-size:10.5px;opacity:.58;margin-top:2px">{{ c.gabung }}</div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <!-- layout: papan per guru -->
+            <sc-if value="{{ layoutPerGuru }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:170px repeat(6,1fr);font-size:11px;letter-spacing:.07em;text-transform:uppercase;opacity:.55;padding-bottom:7px;border-bottom:1px solid var(--color-text)">
+                <div>Guru</div>
+                <sc-for list="{{ hariLabel }}" as="h" hint-placeholder-count="6">
+                  <div style="padding-left:9px">{{ h }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ barisGuru }}" as="g" hint-placeholder-count="7">
+                <div style="display:grid;grid-template-columns:170px repeat(6,1fr);border-bottom:1px solid color-mix(in srgb,var(--color-text) 8%,transparent)">
+                  <div style="padding:var(--pad) 0">
+                    <div style="font:600 12.5px/1.25 var(--font-heading)">{{ g.nama }}</div>
+                    <div style="font-size:10.5px;opacity:.55;margin-top:2px">{{ g.beban }}</div>
+                  </div>
+                  <sc-for list="{{ g.hari }}" as="d" hint-placeholder-count="6">
+                    <div style="padding:var(--pad) 9px;border-left:1px solid color-mix(in srgb,var(--color-text) 8%,transparent);background:{{ d.latar }};box-shadow:{{ d.garis }}">
+                      <div style="font-size:10.5px;line-height:1.5;opacity:.8">{{ d.teks }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </sc-if>
+          </div>
+
+          <aside style="display:flex;flex-direction:column;gap:28px">
+            <sc-if value="{{ bentrokPanel }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <h6 style="margin:0 0 4px;color:var(--color-accent-2-700);display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-warning-diamond" style="font-size:18px"></i>Bentrok aktif</h6>
+                <p style="font-size:11.5px;opacity:.55;margin:0 0 12px">Dihitung server setelah setiap simpan</p>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <sc-for list="{{ bentrokList }}" as="b" hint-placeholder-count="3">
+                    <div style="border-left:2px solid var(--color-accent-2);padding-left:12px">
+                      <div style="font:600 13.5px/1.35 var(--font-heading)">{{ b.judul }}</div>
+                      <div style="font-size:11.5px;opacity:.6;margin-top:3px">{{ b.kapan }}</div>
+                      <button class="btn btn-ghost" type="button" style="margin-top:5px;margin-left:-5px">{{ b.usulan }}</button>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+
+            <div>
+              <h6 style="margin:0 0 4px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-target" style="font-size:18px;color:var(--color-accent)"></i>Pemenuhan jam pelajaran</h6>
+              <p style="font-size:11.5px;opacity:.55;margin:0 0 13px">Target dari kolom targetPeriodsPerWeek</p>
+              <div style="display:flex;flex-direction:column;gap:12px;font-size:12px">
+                <sc-for list="{{ pemenuhan }}" as="v" hint-placeholder-count="6">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;gap:10px"><span>{{ v.mapel }}</span><span style="color:{{ v.warna }}">{{ v.rasio }}</span></div>
+                    <div style="height:4px;background:var(--color-neutral-200);margin-top:4px"><div style="height:4px;width:{{ v.persen }};background:{{ v.warna }}"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div>
+              <h6 style="margin:0 0 11px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-palette" style="font-size:18px;color:var(--color-accent)"></i>Arti warna sel</h6>
+              <div style="font-size:12px;line-height:1.6;display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ legenda }}" as="g" hint-placeholder-count="4">
+                  <div style="display:flex;gap:10px"><span style="flex:none;width:15px;height:15px;margin-top:2px;background:{{ g.latar }};box-shadow:{{ g.garis }}"></span><span>{{ g.teks }}</span></div>
+                </sc-for>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- editor slot -->
+        <sc-if value="{{ adaSlot }}" hint-placeholder-val="{{ false }}">
+          <div style="position:sticky;bottom:0;margin:26px -34px -40px;padding:22px 34px 26px;background:var(--color-surface);box-shadow:var(--shadow-lg)">
+            <div style="display:flex;gap:30px;align-items:flex-end;flex-wrap:wrap">
+              <div style="flex:1;min-width:340px">
+                <h3 style="font-size:19px;margin:0 0 3px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px"><i class="ph-duotone ph-pencil-simple-line" style="font-size:21px;color:var(--color-accent)"></i>Atur jadwal · {{ slotJudul }}</h3>
+                <p style="margin:0 0 16px;font-size:12.5px;opacity:.6">Pilih mata pelajaran dan guru untuk slot ini di kelas XI RPL 1.</p>
+                <sc-if value="{{ slotBentrok }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-bottom:15px;padding:10px 13px;background:var(--color-accent-2-100);font-size:12.5px;color:var(--color-accent-2-800);display:flex;align-items:center;gap:9px"><i class="ph-duotone ph-warning-diamond" style="font-size:18px"></i>BENTROK: Guru ini sudah dijadwalkan mengajar di XI RPL 2 pada jam ini.</div>
+                </sc-if>
+                <div style="display:flex;gap:16px;flex-wrap:wrap">
+                  <div class="field" style="flex:1;min-width:180px"><label>Mata pelajaran</label>
+                    <select class="input">
+                      <sc-for list="{{ daftarMapel }}" as="m" hint-placeholder-count="6"><option selected="{{ m.aktif }}">{{ m.nama }}</option></sc-for>
+                    </select>
+                  </div>
+                  <div class="field" style="flex:1;min-width:180px"><label>Guru pengajar</label>
+                    <select class="input">
+                      <sc-for list="{{ daftarGuru }}" as="g" hint-placeholder-count="6"><option selected="{{ g.aktif }}">{{ g.nama }}</option></sc-for>
+                    </select>
+                  </div>
+                  <div class="field" style="flex:1;min-width:150px"><label>Ruang</label>
+                    <select class="input"><option>Lab RPL 1</option><option>Lab RPL 2</option><option>R. 11</option><option>Lab Multimedia</option></select>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <button class="btn btn-secondary" type="button" onClick="{{ tutupSlot }}">Batal</button>
+                <button class="btn btn-secondary" type="button" onClick="{{ tutupSlot }}" style="color:var(--color-accent-2-700);display:inline-flex;align-items:center;gap:7px"><i class="ph-duotone ph-trash" style="font-size:16px"></i>Kosongkan</button>
+                <button class="btn btn-primary" type="button" onClick="{{ tutupSlot }}" style="display:inline-flex;align-items:center;gap:7px"><i class="ph-duotone ph-check-circle" style="font-size:17px"></i>Simpan</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <!-- ══ AUTO-GENERATOR ══ -->
+      <sc-if value="{{ diGenerate }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:26px">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-lightning" style="font-size:16px"></i>Layanan otomatis</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Auto-Generator jadwal</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62;max-width:62ch">Algoritma greedy mengurutkan kertas kerja dari beban terberat, lalu mengisi slot pertama yang bebas guru dan bebas kelas. Maksimal dua jam mapel sama per hari.</p>
+        </div>
+
+        <sc-if value="{{ generateWizard }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:0;margin-bottom:30px;border-bottom:1px solid var(--color-divider)">
+            <sc-for list="{{ langkah }}" as="l" hint-placeholder-count="3">
+              <div style="flex:1;padding:0 22px 16px 0">
+                <div style="display:flex;align-items:baseline;gap:10px">
+                  <span style="font:600 26px/1 var(--font-heading);color:{{ l.warna }}">{{ l.no }}</span>
+                  <span style="font:600 15px/1.2 var(--font-heading);color:{{ l.warna }}">{{ l.judul }}</span>
+                </div>
+                <div style="font-size:11.5px;opacity:.55;margin-top:5px;padding-left:34px">{{ l.detail }}</div>
+                <div style="height:2px;margin-top:14px;background:{{ l.bar }}"></div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:400px 1fr;gap:46px;align-items:start">
+          <div>
+            <h6 style="margin:0 0 4px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-sliders-horizontal" style="font-size:18px;color:var(--color-accent)"></i>Batasan penjadwalan</h6>
+            <p style="font-size:12.5px;opacity:.6;margin:0 0 20px">Batasan keras sudah berjalan di kode. Batasan lunak adalah usulan baru untuk menilai kualitas hasil.</p>
+
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:11px">Keras — wajib</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px;font-size:13.5px">
+              <sc-for list="{{ batasanKeras }}" as="b" hint-placeholder-count="5">
+                <label style="display:flex;gap:10px;align-items:flex-start;line-height:1.5"><input type="checkbox" checked="{{ b.aktif }}" style="margin-top:4px;accent-color:var(--color-accent)"><span>{{ b.teks }} <span style="font-size:11px;opacity:.5">{{ b.asal }}</span></span></label>
+              </sc-for>
+            </div>
+
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:11px">Lunak — diusahakan</div>
+            <div style="display:flex;flex-direction:column;gap:17px;margin-bottom:26px">
+              <sc-for list="{{ batasanLunak }}" as="b" hint-placeholder-count="4">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span>{{ b.teks }}</span><span style="opacity:.5">{{ b.bobot }}</span></div>
+                  <input type="range" min="0" max="3" value="{{ b.nilai }}" style="width:100%;accent-color:var(--color-accent)">
+                </div>
+              </sc-for>
+            </div>
+
+            <div class="field" style="margin-bottom:18px">
+              <label>Cakupan</label>
+              <select class="input"><option>6 rombel kelas XI (belum terkunci)</option><option>Semua rombel tahun ajaran aktif</option><option>Pilih manual…</option></select>
+            </div>
+            <button class="btn btn-primary btn-block" type="button" onClick="{{ jalankan }}" style="display:flex;align-items:center;justify-content:center;gap:8px"><i class="ph-duotone ph-lightning" style="font-size:18px"></i>{{ labelJalankan }}</button>
+            <p style="font-size:11.5px;opacity:.55;margin:12px 0 0;line-height:1.5">Catatan: kode saat ini menjalankan <b>deleteMany</b> lalu membuat ulang seluruh jadwal tahun ajaran. Sebaiknya hasil disimpan sebagai draf terpisah dulu.</p>
+          </div>
+
+          <div>
+            <sc-if value="{{ generateIdle }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:60px 0;max-width:46ch">
+                <h3 style="font-size:20px;margin:0 0 8px;letter-spacing:-.02em">Belum dijalankan</h3>
+                <p style="font-size:13.5px;opacity:.65;line-height:1.65;margin:0">Pastikan kertas kerja sudah lengkap sebelum menjalankan generator. Jam yang tidak dapat ditempatkan akan dilaporkan sebagai daftar sisa, bukan diam-diam dibuang.</p>
+                <button class="btn btn-ghost" type="button" onClick="{{ keKertas }}" style="margin-top:14px;margin-left:-5px">Buka kertas kerja</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ generateJalan }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:60px 0;max-width:46ch">
+                <h3 style="font-size:20px;margin:0 0 8px;letter-spacing:-.02em">Menjalankan generator…</h3>
+                <div style="height:5px;background:var(--color-neutral-200);margin:16px 0 10px"><div style="height:5px;width:62%;background:var(--color-accent)"></div></div>
+                <p style="font-size:12.5px;opacity:.6;margin:0">Menempatkan 288 blok · 6 rombel · memeriksa bentrok guru dan izin</p>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ generateSelesai }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:5px">
+                <h3 style="font-size:22px;margin:0;letter-spacing:-.02em">Hasil generate</h3>
+                <span class="tag tag-accent">Draf, belum diterapkan</span>
+              </div>
+              <p style="font-size:12.5px;opacity:.6;margin:0 0 24px">Selesai 4,2 detik · dicatat ke AuditLog sebagai AUTO_GENERATE_SCHEDULE</p>
+
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:30px">
+                <sc-for list="{{ hasilAngka }}" as="h" hint-placeholder-count="3">
+                  <div style="padding:0 20px;border-left:1px solid var(--color-divider)">
+                    <div style="font:600 38px/1 var(--font-heading);letter-spacing:-.03em;color:{{ h.warna }}">{{ h.angka }}</div>
+                    <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:6px">{{ h.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <h6 style="margin:0 0 4px">Jam yang tidak dapat ditempatkan</h6>
+              <table class="table" style="margin-bottom:26px">
+                <thead><tr><th>Kelas</th><th>Mata pelajaran</th><th>Guru</th><th>Sisa jam</th><th>Sebab</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ sisaJam }}" as="s" hint-placeholder-count="4">
+                    <tr><td style="font-weight:600">{{ s.kelas }}</td><td>{{ s.mapel }}</td><td>{{ s.guru }}</td><td>{{ s.sisa }}</td><td style="opacity:.7">{{ s.sebab }}</td></tr>
+                  </sc-for>
+                </tbody>
+              </table>
+
+              <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button class="btn btn-secondary" type="button" onClick="{{ resetGenerate }}">Buang hasil</button>
+                <button class="btn btn-secondary" type="button">Simpan sebagai draf</button>
+                <button class="btn btn-primary" type="button" onClick="{{ kePapan }}">Terapkan &amp; buka papan</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ══ KERTAS KERJA ══ -->
+      <sc-if value="{{ diKertas }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-table" style="font-size:16px"></i>Matriks beban</div>
+            <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Kertas kerja penugasan</h1>
+            <p style="margin:0;font-size:13.5px;opacity:.62">Guru mana mengajar mapel apa di kelas mana, beserta beban jam per minggu.</p>
+          </div>
+          <button class="btn btn-primary" type="button" onClick="{{ keGenerate }}" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-lightning" style="font-size:17px"></i>Lanjut ke Auto-Generator</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:300px 1fr;gap:46px;align-items:start">
+          <div>
+            <h6 style="margin:0 0 14px;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-plus-circle" style="font-size:18px;color:var(--color-accent)"></i>Tambah penugasan</h6>
+            <div style="display:flex;flex-direction:column;gap:15px">
+              <div class="field"><label>Kelas</label><select class="input"><option>XI RPL 1</option><option>XI RPL 2</option><option>X TKJ 1</option></select></div>
+              <div class="field"><label>Mata pelajaran</label><select class="input"><option>Basis Data (6 jam)</option><option>Matematika (4 jam)</option><option>Bahasa Indonesia (3 jam)</option></select></div>
+              <div class="field"><label>Guru pengajar</label><select class="input"><option>Sinta Wulandari</option><option>Dwi Hartanto</option><option>Retno Setyowati</option></select></div>
+              <div class="field"><label>Beban jam per minggu</label><input class="input" type="number" value="6"><div style="font-size:11.5px;opacity:.55;margin-top:5px">Bisa berbeda dari target mapel bila kelas butuh penyesuaian.</div></div>
+              <button class="btn btn-primary btn-block" type="button">Simpan penugasan</button>
+            </div>
+          </div>
+
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+              <h6 style="margin:0">Penugasan tahun ajaran aktif</h6>
+              <span style="font-size:12px;opacity:.55">142 penugasan · 24 rombel</span>
+            </div>
+            <table class="table">
+              <thead><tr><th>Kelas</th><th>Mata pelajaran</th><th>Guru</th><th>Beban jam</th><th>Terjadwal</th><th></th></tr></thead>
+              <tbody>
+                <sc-for list="{{ kertasKerja }}" as="k" hint-placeholder-count="9">
+                  <tr>
+                    <td style="font-weight:600">{{ k.kelas }}</td>
+                    <td>{{ k.mapel }}</td>
+                    <td>{{ k.guru }}</td>
+                    <td>{{ k.beban }}</td>
+                    <td><span class="{{ k.tagClass }}">{{ k.terjadwal }}</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost" type="button" style="color:var(--color-accent-2-700)">Hapus</button></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ══ GURU & IZIN ══ -->
+      <sc-if value="{{ diGuru }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:26px">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-chalkboard-teacher" style="font-size:16px"></i>Tenaga pendidik</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Manajemen guru &amp; izin</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62">45 guru · status keaktifan, jam berhalangan, dan serah terima jadwal.</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 350px;gap:46px;align-items:start">
+          <div>
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+              <input class="input" type="search" placeholder="Cari nama guru…" style="width:220px">
+              <button class="btn btn-secondary" type="button" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-hand-arrow-down" style="font-size:17px"></i>Serah terima guru</button>
+              <button class="btn btn-primary" type="button" style="margin-left:auto;display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-user-plus" style="font-size:17px"></i>Tambah guru</button>
+            </div>
+            <table class="table">
+              <thead><tr><th>Nama guru</th><th>Mapel diampu</th><th>Kelas</th><th>Jam</th><th style="width:110px">Kuota</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <sc-for list="{{ guruList }}" as="g" hint-placeholder-count="7">
+                  <tr>
+                    <td style="font-weight:600">{{ g.nama }}</td>
+                    <td>{{ g.mapel }}</td>
+                    <td>{{ g.kelas }}</td>
+                    <td style="color:{{ g.warna }};font-weight:600">{{ g.jam }}</td>
+                    <td><div style="height:5px;background:var(--color-neutral-200)"><div style="height:5px;width:{{ g.persen }};background:{{ g.warna }}"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">{{ g.kuota }}</div></td>
+                    <td><span class="{{ g.tagClass }}">{{ g.status }}</span></td>
+                    <td style="text-align:right"><button class="btn btn-ghost" type="button">Atur izin</button></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+
+          <aside>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:6px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-calendar-x" style="font-size:16px"></i>Jam berhalangan</div>
+            <h3 style="font-size:21px;margin:0 0 3px;letter-spacing:-.02em">Retno Setyowati</h3>
+            <p style="font-size:12.5px;opacity:.6;margin:0 0 18px">Klik sel untuk menandai jam guru tidak bisa mengajar. Generator memperlakukannya sebagai slot terpakai.</p>
+
+            <div style="display:grid;grid-template-columns:48px repeat(6,1fr);gap:2px;font-size:9.5px">
+              <div></div>
+              <sc-for list="{{ hariSingkat }}" as="h" hint-placeholder-count="6"><div style="text-align:center;opacity:.5;padding-bottom:4px">{{ h }}</div></sc-for>
+              <sc-for list="{{ izinBaris }}" as="r" hint-placeholder-count="8">
+                <div style="opacity:.5;line-height:21px">Jam {{ r.jam }}</div>
+                <sc-for list="{{ r.sel }}" as="s" hint-placeholder-count="6"><div style="height:21px;cursor:pointer;background:{{ s.latar }}"></div></sc-for>
+              </sc-for>
+            </div>
+            <div style="display:flex;gap:18px;margin-top:12px;font-size:11px">
+              <span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;background:var(--color-accent-200)"></span>Bisa mengajar</span>
+              <span style="display:flex;align-items:center;gap:7px"><span style="width:12px;height:12px;background:var(--color-neutral-300)"></span>Berhalangan</span>
+            </div>
+
+            <div style="margin-top:26px">
+              <h6 style="margin:0 0 9px">Serah terima</h6>
+              <p style="font-size:12.5px;opacity:.7;line-height:1.6;margin:0">Jadwal guru lama tidak dihapus — ditutup dengan <b>validUntil</b> dan dibuat ulang atas nama guru baru, sehingga riwayat tetap utuh.</p>
+            </div>
+            <button class="btn btn-primary btn-block" type="button" style="margin-top:20px">Simpan perubahan</button>
+          </aside>
+        </div>
+      </sc-if>
+
+      <!-- ══ MATA PELAJARAN ══ -->
+      <sc-if value="{{ diMapel }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:24px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-books" style="font-size:16px"></i>Kurikulum</div>
+            <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Mata pelajaran</h1>
+            <p style="margin:0;font-size:13.5px;opacity:.62">32 mapel · target jam per minggu dipakai generator dan validator pemenuhan jam.</p>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input class="input" type="search" placeholder="Cari mapel…" style="width:190px">
+            <button class="btn btn-primary" type="button" style="display:inline-flex;align-items:center;gap:8px"><i class="ph-duotone ph-plus-circle" style="font-size:17px"></i>Tambah mapel</button>
+          </div>
+        </div>
+        <table class="table">
+          <thead><tr><th>Mata pelajaran</th><th>Kode</th><th>Kelompok</th><th>Target jam / minggu</th><th>Butuh ruang</th><th>Blok minimal</th><th></th></tr></thead>
+          <tbody>
+            <sc-for list="{{ mapelList }}" as="m" hint-placeholder-count="9">
+              <tr>
+                <td style="font-weight:600">{{ m.nama }}</td>
+                <td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">{{ m.kode }}</td>
+                <td><span class="{{ m.tagClass }}">{{ m.kelompok }}</span></td>
+                <td>{{ m.target }}</td>
+                <td style="color:{{ m.warnaRuang }}">{{ m.ruang }}</td>
+                <td>{{ m.blok }}</td>
+                <td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <p style="font-size:12px;opacity:.55;margin:16px 0 0;max-width:74ch">Kolom <b>Butuh ruang</b> dan <b>Blok minimal</b> belum ada di model Subject. Keduanya perlu ditambahkan agar mapel praktik tidak jatuh di kelas biasa dan blok praktik tidak terpecah.</p>
+      </sc-if>
+
+      <!-- ══ KELAS & RUANGAN ══ -->
+      <sc-if value="{{ diKelas }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:26px">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-buildings" style="font-size:16px"></i>Rombongan belajar</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Struktur kelas &amp; ruangan</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62">24 rombel tingkat X–XII dan 12 ruang termasuk laboratorium.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:start">
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+              <h6 style="margin:0;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-chalkboard" style="font-size:18px;color:var(--color-accent)"></i>Rombel</h6>
+              <button class="btn btn-ghost" type="button">Tambah rombel</button>
+            </div>
+            <table class="table">
+              <thead><tr><th>Nama</th><th>Tingkat</th><th>Siswa</th><th>Wali kelas</th><th></th></tr></thead>
+              <tbody>
+                <sc-for list="{{ kelasList }}" as="k" hint-placeholder-count="7">
+                  <tr><td style="font-weight:600">{{ k.nama }}</td><td>{{ k.tingkat }}</td><td>{{ k.siswa }}</td><td>{{ k.wali }}</td><td style="text-align:right"><button class="btn btn-ghost" type="button" onClick="{{ kePapan }}">Papan jadwal</button></td></tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+              <h6 style="margin:0;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-door-open" style="font-size:18px;color:var(--color-accent)"></i>Ruangan <span class="tag tag-accent-2" style="margin-left:3px">Entitas baru</span></h6>
+              <button class="btn btn-ghost" type="button">Tambah ruang</button>
+            </div>
+            <table class="table">
+              <thead><tr><th>Nama ruang</th><th>Tipe</th><th>Kapasitas</th><th>Gedung</th><th>Pemakaian</th></tr></thead>
+              <tbody>
+                <sc-for list="{{ ruangList }}" as="r" hint-placeholder-count="7">
+                  <tr><td style="font-weight:600">{{ r.nama }}</td><td><span class="{{ r.tagClass }}">{{ r.tipe }}</span></td><td>{{ r.kapasitas }}</td><td>{{ r.gedung }}</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="height:5px;width:{{ r.persen }};background:{{ r.warna }}"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">{{ r.pakai }}</div></td></tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <p style="font-size:12px;opacity:.55;margin:16px 0 0;line-height:1.6">Model <b>Room</b> belum ada di skema Prisma. Menambahkannya memerlukan kolom <b>roomId</b> di Schedule dan satu aturan bentrok baru: satu ruang hanya untuk satu rombel per jam.</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ══ PUSAT BENTROK ══ -->
+      <sc-if value="{{ diBentrok }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px">
+          <div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-2-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-warning-diamond" style="font-size:16px"></i>Validasi</div>
+            <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">7 bentrok belum selesai</h1>
+            <p style="margin:0;font-size:13.5px;opacity:.62">Dihitung ulang setiap simpan · terakhir 09.41</p>
+          </div>
+          <div style="display:flex;gap:8px"><span class="tag tag-accent-2">4 guru</span><span class="tag tag-accent-2">2 ruang</span><span class="tag tag-neutral">1 kuota jam</span></div>
+        </div>
+        <div>
+          <sc-for list="{{ bentrokPenuh }}" as="b" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:158px 1fr 300px;gap:26px;padding:19px 0;border-top:1px solid {{ b.garisAtas }}">
+              <div>
+                <div style="font:600 12px/1.2 var(--font-heading);letter-spacing:.08em;text-transform:uppercase;color:{{ b.warna }};display:flex;align-items:center;gap:7px"><i class="ph-duotone {{ b.ikon }}" style="font-size:17px"></i>{{ b.jenis }}</div>
+                <div style="font-size:11.5px;opacity:.55;margin-top:6px">{{ b.kapan }}</div>
+                <div style="font-size:11.5px;opacity:.55">{{ b.jam }}</div>
+              </div>
+              <div>
+                <div style="font:600 17px/1.35 var(--font-heading);margin-bottom:6px">{{ b.judul }}</div>
+                <div style="font-size:13px;opacity:.75;line-height:1.65">{{ b.uraian }}</div>
+                <div style="font-size:11.5px;opacity:.5;margin-top:7px;font-family:ui-monospace,Menlo,monospace">{{ b.kode }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-primary" type="button" style="justify-content:flex-start">{{ b.aksi1 }}</button>
+                <button class="btn btn-secondary" type="button" style="justify-content:flex-start">{{ b.aksi2 }}</button>
+                <button class="btn btn-ghost" type="button" onClick="{{ kePapan }}" style="justify-content:flex-start">Buka di papan jadwal</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ══ LAPORAN ══ -->
+      <sc-if value="{{ diLaporan }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:28px">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-file-arrow-down" style="font-size:16px"></i>Keluaran</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Laporan &amp; ekspor</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62">Berkas yang biasanya diminta kepala sekolah, pengawas dan guru.</p>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-bottom:40px">
+          <sc-for list="{{ laporanList }}" as="l" hint-placeholder-count="6">
+            <div style="display:flex;flex-direction:column;gap:7px;padding-left:15px;border-left:2px solid {{ l.warna }}">
+              <i class="ph-duotone {{ l.ikon }}" style="font-size:26px;color:{{ l.warna }};margin-bottom:3px"></i>
+              <div style="font:600 16px/1.3 var(--font-heading)">{{ l.judul }}</div>
+              <div style="font-size:12.5px;opacity:.68;line-height:1.6;flex:1">{{ l.detail }}</div>
+              <div style="display:flex;gap:7px;margin-top:5px">
+                <button class="btn btn-secondary" type="button" style="font-size:12.5px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone ph-microsoft-excel-logo" style="font-size:16px"></i>Excel</button>
+                <button class="btn btn-secondary" type="button" style="font-size:12.5px;padding:6px 12px;display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone ph-file-pdf" style="font-size:16px"></i>PDF</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+          <h6 style="margin:0">Pratinjau · rekap beban mengajar</h6>
+          <span style="font-size:12px;opacity:.55">Format ini yang dicetak ke PDF</span>
+        </div>
+        <table class="table">
+          <thead><tr><th>Guru</th><th>Kuota</th><th>Terjadwal</th><th>Selisih</th><th>Rombel</th><th>Mapel</th><th>Status</th></tr></thead>
+          <tbody>
+            <sc-for list="{{ rekapList }}" as="r" hint-placeholder-count="6">
+              <tr><td style="font-weight:600">{{ r.nama }}</td><td>{{ r.kuota }}</td><td>{{ r.jadwal }}</td><td style="color:{{ r.warna }};font-weight:600">{{ r.selisih }}</td><td>{{ r.rombel }}</td><td>{{ r.mapel }}</td><td><span class="{{ r.tagClass }}">{{ r.status }}</span></td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <!-- ══ AUDIT ══ -->
+      <sc-if value="{{ diAudit }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:26px;max-width:74ch">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-clock-counter-clockwise" style="font-size:16px"></i>Pengawasan sistem</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Riwayat perubahan</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62">Setiap auto-generate, serah terima guru dan perubahan slot tercatat beserta pelakunya.</p>
+        </div>
+        <div style="max-width:900px">
+          <sc-for list="{{ auditPenuh }}" as="a" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:1fr 170px;gap:26px;padding:17px 0;border-top:1px solid var(--color-divider)">
+              <div>
+                <div style="display:flex;align-items:center;gap:11px;flex-wrap:wrap">
+                  <span style="font:600 10px/1 var(--font-heading);letter-spacing:.1em;text-transform:uppercase;background:var(--color-text);color:var(--color-bg);padding:5px 8px;display:inline-flex;align-items:center;gap:6px"><i class="ph-duotone {{ a.ikon }}" style="font-size:13px"></i>{{ a.aksi }}</span>
+                  <span style="font-size:12.5px;opacity:.6">oleh {{ a.oleh }}</span>
+                </div>
+                <p style="margin:9px 0 0;font-size:13.5px;line-height:1.6">{{ a.detail }}</p>
+              </div>
+              <div style="font-size:11.5px;opacity:.5;text-align:right">{{ a.waktu }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- ══ MOBILE ══ -->
+      <sc-if value="{{ diMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-bottom:28px;max-width:70ch">
+          <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-700);margin-bottom:5px;display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-device-mobile" style="font-size:16px"></i>Web + mobile</div>
+          <h1 style="font-size:32px;margin:0 0 5px;letter-spacing:-.025em">Tampilan ponsel</h1>
+          <p style="margin:0;font-size:13.5px;opacity:.62">Guru dan wali kelas hampir selalu membuka jadwal dari ponsel. Grid enam hari tidak dipaksa masuk ke layar kecil — jadwal jadi agenda satu hari.</p>
+        </div>
+
+        <div style="display:flex;gap:26px;flex-wrap:wrap">
+          <div style="width:376px;background:var(--color-surface);padding:22px 20px 26px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+              <div style="font:600 16px/1 var(--font-heading);letter-spacing:-.02em;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-calendar-check" style="font-size:20px;color:var(--color-accent)"></i>SIP<span style="color:var(--color-accent)">·</span>MAPEL</div>
+              <div style="font-size:11px;opacity:.55">Dwi Hartanto</div>
+            </div>
+            <div style="height:2px;background:var(--color-text)"></div>
+            <div style="height:1px;background:var(--color-text);margin-top:2px"></div>
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-top:18px">Selasa, 14 Juli</div>
+            <h2 style="font-size:27px;margin:4px 0 3px;letter-spacing:-.025em">Mengajar hari ini</h2>
+            <p style="margin:0 0 18px;font-size:12.5px;opacity:.6">6 jam · berakhir 12.20</p>
+            <div style="padding:12px 14px;background:var(--color-accent-100);margin-bottom:18px">
+              <div style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-800);opacity:.85;display:flex;align-items:center;gap:6px"><i class="ph-duotone ph-broadcast" style="font-size:15px"></i>Sedang berlangsung</div>
+              <div style="font:600 16px/1.25 var(--font-heading);margin-top:4px">Pemrograman Berorientasi Objek</div>
+              <div style="font-size:12px;opacity:.65;margin-top:3px">XI RPL 1 · Lab RPL 1</div>
+              <div style="font-size:12px;opacity:.65">Jam 5–6 · 09.40–11.00</div>
+            </div>
+            <sc-for list="{{ agendaPonsel }}" as="a" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:56px 1fr;gap:13px;padding:11px 0;border-top:1px solid var(--color-divider);opacity:{{ a.opasitas }}">
+                <div style="font-size:11.5px;line-height:1.4">{{ a.mulai }}<br><span style="opacity:.7">Jam {{ a.jam }}</span></div>
+                <div><div style="font:600 13.5px/1.25 var(--font-heading)">{{ a.mapel }}</div><div style="font-size:11.5px;opacity:.65;margin-top:2px">{{ a.detail }}</div></div>
+              </div>
+            </sc-for>
+            <div style="display:flex;gap:22px;margin-top:20px;padding-top:15px;border-top:1px solid var(--color-text);font-size:12.5px">
+              <span style="color:var(--color-accent);font-weight:600;display:flex;align-items:center;gap:6px"><i class="ph-duotone ph-sun-horizon" style="font-size:17px"></i>Hari ini</span>
+              <span style="opacity:.65;display:flex;align-items:center;gap:6px"><i class="ph-duotone ph-calendar-dots" style="font-size:17px"></i>Minggu ini</span>
+              <span style="opacity:.65;display:flex;align-items:center;gap:6px"><i class="ph-duotone ph-calendar-x" style="font-size:17px"></i>Izin saya</span>
+            </div>
+          </div>
+
+          <div style="width:376px;background:var(--color-surface);padding:22px 20px 26px;border-radius:var(--radius-lg);box-shadow:var(--shadow-md)">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+              <div style="font:600 16px/1 var(--font-heading);letter-spacing:-.02em;display:flex;align-items:center;gap:8px"><i class="ph-duotone ph-calendar-check" style="font-size:20px;color:var(--color-accent)"></i>SIP<span style="color:var(--color-accent)">·</span>MAPEL</div>
+              <div style="font-size:11px;opacity:.55">Wali kelas XI RPL 1</div>
+            </div>
+            <div style="height:2px;background:var(--color-text)"></div>
+            <div style="height:1px;background:var(--color-text);margin-top:2px"></div>
+            <h2 style="font-size:25px;margin:18px 0 3px;letter-spacing:-.025em">Jadwal kelas saya</h2>
+            <p style="margin:0 0 16px;font-size:12.5px;opacity:.6">13–18 Juli 2026 · 46 dari 48 jam terisi</p>
+            <div style="padding:11px 13px;background:var(--color-accent-2-100);margin-bottom:16px">
+              <div style="font:600 13.5px/1.3 var(--font-heading);color:var(--color-accent-2-800);display:flex;align-items:center;gap:7px"><i class="ph-duotone ph-warning-circle" style="font-size:17px"></i>2 jam belum terisi</div>
+              <div style="font-size:11.5px;color:var(--color-accent-2-800);opacity:.85;margin-top:3px">Rabu Jam 7–8 · sudah dilaporkan ke Waka Kurikulum</div>
+            </div>
+            <sc-for list="{{ mingguPonsel }}" as="m" hint-placeholder-count="6">
+              <div style="padding:12px 0;border-top:1px solid var(--color-divider)">
+                <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:7px"><span style="font:600 13.5px var(--font-heading);color:{{ m.warna }}">{{ m.hari }}</span><span style="font-size:11px;opacity:.5">{{ m.ringkas }}</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:5px">
+                  <sc-for list="{{ m.mapel }}" as="x" hint-placeholder-count="4"><span class="{{ x.tagClass }}">{{ x.nama }}</span></sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440},&quot;peran&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Admin Kurikulum&quot;,&quot;Guru&quot;,&quot;Kepala Sekolah&quot;,&quot;Wali Kelas&quot;],&quot;default&quot;:&quot;Admin Kurikulum&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Peran&quot;},&quot;navigasi&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Sidebar&quot;,&quot;Top-nav&quot;],&quot;default&quot;:&quot;Sidebar&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variasi&quot;},&quot;kepadatan&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Lapang&quot;,&quot;Padat&quot;],&quot;default&quot;:&quot;Lapang&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variasi&quot;},&quot;tampilanBentrok&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Panel samping&quot;,&quot;Halaman terpisah&quot;],&quot;default&quot;:&quot;Panel samping&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variasi&quot;},&quot;alurGenerate&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Satu layar&quot;,&quot;Wizard 3 langkah&quot;],&quot;default&quot;:&quot;Satu layar&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variasi&quot;}}">
+const HARI = [
+  ["MONDAY", "Senin", "Sen"], ["TUESDAY", "Selasa", "Sel"], ["WEDNESDAY", "Rabu", "Rab"],
+  ["THURSDAY", "Kamis", "Kam"], ["FRIDAY", "Jumat", "Jum"], ["SATURDAY", "Sabtu", "Sab"],
+];
+// timeBlockService.ts: 8 periode × 40 menit mulai 07.00
+const WAKTU = [
+  ["07.00", "07.40"], ["07.40", "08.20"], ["08.20", "09.00"], ["09.00", "09.40"],
+  ["09.40", "10.20"], ["10.20", "11.00"], ["11.00", "11.40"], ["11.40", "12.20"],
+];
+
+// [dariJam, keJam, mapel, guru, ruang, jenis]
+const SPEC = {
+  MONDAY: [
+    [1, 1, "Upacara Bendera", "Seluruh guru", "Lapangan", "umum"],
+    [2, 3, "Matematika", "Retno Setyowati", "R. 11", "kbm"],
+    [4, 4, "Bahasa Indonesia", "Anwar Hidayat", "R. 11", "kbm"],
+    [5, 6, "Pemrograman Berorientasi Objek", "Dwi Hartanto", "Lab RPL 1", "praktik"],
+    [7, 8, "Basis Data", "Sinta Wulandari", "Lab RPL 2", "praktik"],
+  ],
+  TUESDAY: [
+    [1, 2, "Bahasa Indonesia", "Anwar Hidayat", "R. 11", "kbm"],
+    [3, 3, "PPKn", "Yuni Astari", "R. 11", "kbm"],
+    [4, 4, "Bahasa Inggris", "Laras Ayuningtyas", "R. 11", "kbm"],
+    [5, 6, "Pemrograman Berorientasi Objek", "Dwi Hartanto", "Lab RPL 1", "praktik"],
+    [7, 8, "Projek Kreatif dan Kewirausahaan", "Bagas Prakoso", "Lab RPL 2", "bentrokGuru"],
+  ],
+  WEDNESDAY: [
+    [1, 2, "Matematika", "Retno Setyowati", "R. 11", "kbm"],
+    [3, 3, "PJOK", "Gilang Saputra", "Lapangan", "kbm"],
+    [4, 4, "Sejarah", "Wida Kusuma", "R. 11", "kbm"],
+    [5, 6, "Basis Data", "Sinta Wulandari", "Lab RPL 2", "praktik"],
+    [7, 8, "", "", "", "kosong"],
+  ],
+  THURSDAY: [
+    [1, 2, "Pemrograman Web", "Dwi Hartanto", "Lab RPL 1", "bentrokRuang"],
+    [3, 3, "Bahasa Inggris", "Laras Ayuningtyas", "R. 11", "kbm"],
+    [4, 4, "Seni Budaya", "Ratih Purnama", "R. Seni", "kbm"],
+    [5, 6, "Matematika", "Retno Setyowati", "R. 11", "kbm"],
+    [7, 8, "Pendidikan Agama dan Budi Pekerti", "Fauzi Rahman", "R. 11", "kbm"],
+  ],
+  FRIDAY: [
+    [1, 2, "Projek IPAS", "Ayu Kartika", "R. 11", "kbm"],
+    [3, 3, "Bahasa Indonesia", "Anwar Hidayat", "R. 11", "kbm"],
+    [4, 5, "Basis Data", "Sinta Wulandari", "Lab RPL 2", "praktik"],
+    [6, 8, "", "", "", "libur"],
+  ],
+  SATURDAY: [
+    [1, 3, "Projek Kreatif dan Kewirausahaan", "Bagas Prakoso", "Lab RPL 2", "praktik"],
+    [4, 4, "Bimbingan Konseling", "Yuni Astari", "R. 11", "kbm"],
+    [5, 6, "Mapel Pilihan: Desain Grafis", "Rian Nugroho", "Lab Multimedia", "praktik"],
+    [7, 8, "", "", "", "libur"],
+  ],
+};
+
+const HATCH = "repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)";
+
+const GAYA = {
+  kbm: { latar: "transparent", garis: "none", tag: "", tagClass: "", judul: "var(--color-text)" },
+  umum: { latar: "var(--color-neutral-100)", garis: "none", tag: "", tagClass: "", judul: "var(--color-text)" },
+  praktik: { latar: "var(--color-accent-100)", garis: "none", tag: "Praktik", tagClass: "tag tag-accent", judul: "var(--color-text)" },
+  bentrokGuru: { latar: "var(--color-accent-2-100)", garis: "inset 2px 0 0 var(--color-accent-2)", tag: "Guru bentrok", tagClass: "tag tag-accent-2", judul: "var(--color-accent-2-900)" },
+  bentrokRuang: { latar: "var(--color-accent-2-100)", garis: "inset 2px 0 0 var(--color-accent-2)", tag: "Ruang bentrok", tagClass: "tag tag-accent-2", judul: "var(--color-accent-2-900)" },
+  kosong: { latar: "color-mix(in srgb,var(--color-accent) 6%,transparent)", garis: "inset 0 0 0 1px var(--color-accent-300)", tag: "", tagClass: "", judul: "var(--color-accent-700)" },
+  libur: { latar: HATCH, garis: "none", tag: "", tagClass: "", judul: "var(--color-text)" },
+};
+
+function slotMap() {
+  const m = {};
+  for (const [hari, list] of Object.entries(SPEC)) {
+    for (const [dari, ke, mapel, guru, ruang, jenis] of list) {
+      for (let p = dari; p <= ke; p++) m[hari + "-" + p] = { mapel, guru, ruang, jenis, awal: p === dari };
+    }
+  }
+  return m;
+}
+const SLOT = slotMap();
+
+const MENU_SEMUA = [
+  ["beranda", "Beranda", ["admin", "guru", "kepsek", "wali"], "ph-house-line"],
+  ["papan", "Papan Jadwal", ["admin", "guru", "kepsek", "wali"], "ph-calendar-dots"],
+  ["generate", "Auto-Generate", ["admin"], "ph-lightning"],
+  ["kertas", "Kertas Kerja", ["admin"], "ph-table"],
+  ["guru", "Guru & Izin", ["admin", "kepsek"], "ph-chalkboard-teacher"],
+  ["mapel", "Mata Pelajaran", ["admin"], "ph-books"],
+  ["kelas", "Kelas & Ruangan", ["admin"], "ph-buildings"],
+  ["bentrok", "Bentrok", ["admin", "kepsek"], "ph-warning-diamond"],
+  ["laporan", "Laporan", ["admin", "kepsek", "wali"], "ph-file-arrow-down"],
+  ["audit", "Audit", ["admin", "kepsek"], "ph-clock-counter-clockwise"],
+  ["mobile", "Mobile", ["admin", "guru", "kepsek", "wali"], "ph-device-mobile"],
+];
+
+const PERAN = {
+  "Admin Kurikulum": ["admin", "Dwi Astuti · Waka Kurikulum"],
+  "Guru": ["guru", "Dwi Hartanto · Guru RPL"],
+  "Kepala Sekolah": ["kepsek", "Hendra Wijaya · Kepala Sekolah"],
+  "Wali Kelas": ["wali", "Sinta Wulandari · Wali XI RPL 1"],
+};
+
+class Component extends DCLogic {
+  state = { layar: "beranda", slot: null, gen: "idle", layout: "matriks" };
+
+  ke(layar) { return () => this.setState({ layar, slot: null }); }
+
+  sel(hari, jam) {
+    const s = SLOT[hari + "-" + jam] || { mapel: "", guru: "", ruang: "", jenis: "kosong", awal: true };
+    const g = GAYA[s.jenis];
+    const dipilih = this.state.slot && this.state.slot.hari === hari && this.state.slot.jam === jam;
+    let mapel = s.mapel, guru = s.guru, ruang = s.ruang, tag = g.tag;
+    if (s.jenis === "kosong") { mapel = "Kosong"; guru = "Klik untuk mengisi"; ruang = ""; }
+    if (s.jenis === "libur") { mapel = ""; guru = "Di luar jam sekolah"; ruang = ""; }
+    if (!s.awal) { guru = ""; ruang = ""; tag = ""; }
+    return {
+      hari, jam, mapel, guru, ruang, tag,
+      ikonGuru: guru ? (s.jenis === "kosong" ? "ph-plus-circle" : "ph-user") : "",
+      ikonRuang: ruang ? (ruang.indexOf("Lab") === 0 ? "ph-flask" : ruang === "Lapangan" ? "ph-tree" : "ph-door") : "",
+      tagClass: tag ? g.tagClass : "",
+      latar: dipilih ? "var(--color-accent-200)" : g.latar,
+      garis: dipilih ? "inset 0 0 0 2px var(--color-accent)" : g.garis,
+      warnaJudul: g.judul,
+      mulai: WAKTU[jam - 1][0],
+      gabung: [s.guru, s.ruang].filter(Boolean).join(" · "),
+      klik: s.jenis === "libur" ? null : () => this.setState({ slot: { hari, jam } }),
+    };
+  }
+
+  renderVals() {
+    const p = this.props;
+    const st = this.state;
+    const peranNama = p.peran ?? "Admin Kurikulum";
+    const [peran, namaPengguna] = PERAN[peranNama] || PERAN["Admin Kurikulum"];
+    const navigasi = p.navigasi ?? "Sidebar";
+    const kepadatan = p.kepadatan ?? "Lapang";
+    const bentrokMode = p.tampilanBentrok ?? "Panel samping";
+    const alurGenerate = p.alurGenerate ?? "Satu layar";
+    const padat = kepadatan === "Padat";
+
+    const menu = MENU_SEMUA.filter(m => m[2].includes(peran))
+      .filter(m => m[0] !== "bentrok" || bentrokMode === "Halaman terpisah")
+      .map(([id, label, , ikon]) => {
+        const aktif = st.layar === id;
+        return {
+          label, ikon, buka: this.ke(id),
+          warna: aktif ? "var(--color-accent)" : "inherit",
+          bobot: aktif ? "600" : "400",
+          latar: aktif && navigasi === "Sidebar" ? "var(--color-accent-100)" : "transparent",
+        };
+      });
+
+    const baris = [];
+    for (let j = 1; j <= 8; j++) {
+      if (j === 5) baris.push({ istirahat: true, kbm: false });
+      baris.push({
+        istirahat: false, kbm: true, jam: j,
+        waktu: WAKTU[j - 1][0] + "–" + WAKTU[j - 1][1],
+        sel: HARI.map(([k]) => this.sel(k, j)),
+      });
+    }
+
+    const agenda = HARI.map(([k, l]) => ({
+      hari: l,
+      ringkas: k === "FRIDAY" ? "5 jam" : k === "SATURDAY" ? "6 jam" : k === "WEDNESDAY" ? "6 jam" : "8 jam",
+      sel: [1, 2, 3, 4, 5, 6, 7, 8].map(j => this.sel(k, j)).filter(c => c.mapel || c.guru === "Klik untuk mengisi"),
+    }));
+
+    const guruBaris = [
+      ["Dwi Hartanto", "27 / 30 jam", ["PBO · X RPL 2", "PBO · XI RPL 1", "Pem. Web · XII RPL 1", "PBO ·  XI RPL 2", "Pem. Web · XII RPL 2", "—"], -1],
+      ["Retno Setyowati", "32 / 30 jam", ["MTK · XI RPL 1", "MTK · X TKJ 1", "MTK · XI RPL 1", "MTK · XI RPL 1", "MTK Lanjut · XII AKL 1", "MTK · X TKJ 2"], -1],
+      ["Sinta Wulandari", "24 / 30 jam", ["Basis Data · XI RPL 1", "—", "Basis Data · XI RPL 1", "Basis Data · XII RPL 1", "Basis Data · XI RPL 1", "—"], -1],
+      ["Bagas Prakoso", "21 / 30 jam", ["—", "PKK · XI RPL 1 + XI RPL 2", "—", "PKK · XII RPL 1", "—", "PKK · XI RPL 1"], 1],
+      ["Anwar Hidayat", "21 / 30 jam", ["B. Indonesia · XI RPL 1", "B. Indonesia · XI RPL 1", "—", "B. Indonesia · X TKJ 1", "B. Indonesia · XI RPL 1", "—"], -1],
+      ["Ayu Kartika", "18 / 24 jam", ["Projek IPAS · X RPL 1", "—", "Projek IPAS · X TKJ 1", "—", "Projek IPAS · XI RPL 1", "—"], -1],
+      ["Laras Ayuningtyas", "23 / 30 jam", ["—", "B. Inggris · XI RPL 1", "B. Inggris · X TKJ 2", "B. Inggris · XI RPL 1", "—", "B. Inggris · XII AKL 1"], -1],
+    ];
+
+    const izinTidakBisa = { "FRIDAY-1": 1, "FRIDAY-2": 1, "FRIDAY-6": 1, "FRIDAY-7": 1, "FRIDAY-8": 1, "SATURDAY-4": 1, "SATURDAY-5": 1, "SATURDAY-6": 1, "SATURDAY-7": 1, "SATURDAY-8": 1, "TUESDAY-7": 1, "TUESDAY-8": 1 };
+
+    return {
+      pad: padat ? "5px" : "10px",
+      gapv: padat ? "14px" : "22px",
+      tinggiSel: padat ? "48px" : "62px",
+      tahunAjaran: "T.A. 2026/2027 · Ganjil",
+      namaPengguna,
+      menu,
+      navSamping: navigasi === "Sidebar",
+      navAtas: navigasi === "Top-nav",
+      bisaUbah: peran === "admin",
+
+      diBeranda: st.layar === "beranda",
+      diPapan: st.layar === "papan",
+      diGenerate: st.layar === "generate",
+      diKertas: st.layar === "kertas",
+      diGuru: st.layar === "guru",
+      diMapel: st.layar === "mapel",
+      diKelas: st.layar === "kelas",
+      diBentrok: st.layar === "bentrok",
+      diLaporan: st.layar === "laporan",
+      diAudit: st.layar === "audit",
+      diMobile: st.layar === "mobile",
+
+      kePapan: this.ke("papan"), keGenerate: this.ke("generate"), keKertas: this.ke("kertas"),
+      keBentrok: this.ke("bentrok"), keLaporan: this.ke("laporan"), keAudit: this.ke("audit"),
+
+      statistik: [
+        { angka: "45", label: "Guru aktif", warna: "var(--color-text)", ikon: "ph-users-three" },
+        { angka: "24", label: "Rombel kelas", warna: "var(--color-text)", ikon: "ph-chalkboard" },
+        { angka: "32", label: "Mata pelajaran", warna: "var(--color-text)", ikon: "ph-books" },
+        { angka: "1.084", label: "Blok jadwal aktif", warna: "var(--color-accent-700)", ikon: "ph-squares-four" },
+      ],
+      rombelList: [
+        { nama: "X TKJ 1", wali: "Fauzi Rahman", jam: "46 / 46", persen: "100%", bar: "var(--color-accent)", status: "Terkunci", tagClass: "tag tag-accent", aksi: "Lihat" },
+        { nama: "XI RPL 1", wali: "Sinta Wulandari", jam: "46 / 48", persen: "96%", bar: "var(--color-accent)", status: "3 bentrok", tagClass: "tag tag-accent-2", aksi: "Perbaiki" },
+        { nama: "XI RPL 2", wali: "Bagas Prakoso", jam: "45 / 48", persen: "94%", bar: "var(--color-accent)", status: "1 bentrok", tagClass: "tag tag-accent-2", aksi: "Perbaiki" },
+        { nama: "XI TKJ 2", wali: "Laras Ayuningtyas", jam: "39 / 48", persen: "81%", bar: "var(--color-accent)", status: "Draf", tagClass: "tag tag-neutral", aksi: "Lanjutkan" },
+        { nama: "XII AKL 1", wali: "Retno Setyowati", jam: "48 / 48", persen: "100%", bar: "var(--color-accent)", status: "Menunggu verifikasi", tagClass: "tag tag-neutral", aksi: "Tinjau" },
+        { nama: "XII RPL 1", wali: "Rian Nugroho", jam: "44 / 48", persen: "92%", bar: "var(--color-accent)", status: "Draf", tagClass: "tag tag-neutral", aksi: "Lanjutkan" },
+      ],
+      peringatan: [
+        { judul: "Bagas Prakoso mengajar dua rombel di jam sama", detail: "Selasa Jam 7–8 · XI RPL 1 dan XI RPL 2", warna: "var(--color-accent-2)", ikon: "ph-user-focus" },
+        { judul: "Lab RPL 1 dipesan dua rombel", detail: "Kamis Jam 1–2 · kapasitas 36, permintaan 68", warna: "var(--color-accent-2)", ikon: "ph-door-open" },
+        { judul: "Retno Setyowati 32 jam dari kuota 30", detail: "Kelebihan 2 jam · perlu redistribusi", warna: "var(--color-accent)", ikon: "ph-scales" },
+      ],
+      auditRingkas: [
+        { waktu: "09.14", teks: "AUTO_GENERATE_SCHEDULE · 288 blok, 4 sisa", ikon: "ph-lightning" },
+        { waktu: "08.52", teks: "Basis Data XI RPL 1 dipindah ke Rabu Jam 5", ikon: "ph-arrows-left-right" },
+        { waktu: "Kemarin", teks: "TEACHER_HANDOVER · Hana P. menggantikan Yusuf A.", ikon: "ph-hand-arrow-down" },
+        { waktu: "Kemarin", teks: "X TKJ 1 dikunci oleh Dwi Astuti", ikon: "ph-lock-simple" },
+      ],
+
+      hariLabel: HARI.map(h => h[1]),
+      hariSingkat: HARI.map(h => h[2]),
+      baris, agenda,
+      layoutMatriks: st.layout === "matriks",
+      layoutAgenda: st.layout === "agenda",
+      layoutPerGuru: st.layout === "guru",
+      layoutPilihan: [["matriks", "Matriks"], ["agenda", "Agenda"], ["guru", "Per guru"]].map(([id, label]) => ({
+        label, aktif: st.layout === id,
+        pilih: () => this.setState({ layout: id, slot: null }),
+        latar: st.layout === id ? "var(--color-accent)" : "transparent",
+        warna: st.layout === id ? "var(--color-bg)" : "inherit",
+      })),
+      barisGuru: guruBaris.map(([nama, beban, hari, x]) => ({
+        nama, beban,
+        hari: hari.map((teks, i) => ({
+          teks,
+          latar: x === 1 && i === 1 ? "var(--color-accent-2-100)" : "transparent",
+          garis: x === 1 && i === 1 ? "inset 2px 0 0 var(--color-accent-2)" : "none",
+        })),
+      })),
+      lebarPanel: bentrokMode === "Panel samping" ? "292px" : "268px",
+      bentrokDiAtas: bentrokMode === "Halaman terpisah",
+      bentrokPanel: bentrokMode === "Panel samping",
+      bentrokList: [
+        { judul: "Bagas Prakoso di dua rombel", kapan: "Selasa Jam 7–8 · XI RPL 1 + XI RPL 2", usulan: "Pindahkan XI RPL 2 ke Rabu" },
+        { judul: "Lab RPL 1 dipesan dua rombel", kapan: "Kamis Jam 1–2 · dengan X RPL 2", usulan: "Pindahkan X RPL 2 ke Lab RPL 2" },
+        { judul: "Rabu Jam 7–8 kosong", kapan: "Basis Data kurang 2 jam dari target", usulan: "Isi otomatis" },
+      ],
+      pemenuhan: [
+        { mapel: "Basis Data", rasio: "4 / 6 jam", persen: "67%", warna: "var(--color-accent-2-700)" },
+        { mapel: "Pemrograman Berorientasi Objek", rasio: "5 / 5 jam", persen: "100%", warna: "var(--color-accent)" },
+        { mapel: "Matematika", rasio: "4 / 4 jam", persen: "100%", warna: "var(--color-accent)" },
+        { mapel: "Bahasa Indonesia", rasio: "4 / 3 jam", persen: "100%", warna: "var(--color-accent-2-700)" },
+        { mapel: "Projek Kreatif dan Kewirausahaan", rasio: "5 / 5 jam", persen: "100%", warna: "var(--color-accent)" },
+        { mapel: "Bahasa Inggris", rasio: "2 / 3 jam", persen: "67%", warna: "var(--color-accent-2-700)" },
+      ],
+      legenda: [
+        { teks: "Mapel umum di kelas biasa", latar: "transparent", garis: "inset 0 0 0 1px var(--color-divider)" },
+        { teks: "Blok praktik di laboratorium", latar: "var(--color-accent-100)", garis: "none" },
+        { teks: "Bentrok guru atau ruang", latar: "var(--color-accent-2-100)", garis: "inset 2px 0 0 var(--color-accent-2)" },
+        { teks: "Di luar jam sekolah", latar: HATCH, garis: "none" },
+      ],
+
+      adaSlot: !!st.slot,
+      slotJudul: st.slot ? (HARI.find(h => h[0] === st.slot.hari)[1] + " Jam " + st.slot.jam) : "",
+      slotBentrok: !!st.slot && st.slot.hari === "TUESDAY" && st.slot.jam >= 7,
+      tutupSlot: () => this.setState({ slot: null }),
+      daftarMapel: ["Basis Data", "Pemrograman Berorientasi Objek", "Pemrograman Web", "Matematika", "Bahasa Indonesia", "Projek Kreatif dan Kewirausahaan"].map((nama, i) => ({ nama, aktif: i === 0 })),
+      daftarGuru: ["Sinta Wulandari", "Dwi Hartanto", "Retno Setyowati", "Anwar Hidayat", "Bagas Prakoso", "Rian Nugroho"].map((nama, i) => ({ nama, aktif: i === 0 })),
+
+      generateWizard: alurGenerate === "Wizard 3 langkah",
+      generateIdle: st.gen === "idle",
+      generateJalan: st.gen === "jalan",
+      generateSelesai: st.gen === "selesai",
+      labelJalankan: st.gen === "selesai" ? "Jalankan ulang" : "Jalankan generate",
+      jalankan: () => { this.setState({ gen: "jalan" }); setTimeout(() => this.setState({ gen: "selesai" }), 1400); },
+      resetGenerate: () => this.setState({ gen: "idle" }),
+      langkah: [
+        { no: "1", judul: "Periksa kertas kerja", detail: "142 penugasan · 4 kelas belum lengkap", warna: "var(--color-text)", bar: "var(--color-accent)" },
+        { no: "2", judul: "Atur batasan", detail: "5 batasan keras · 4 batasan lunak", warna: "var(--color-accent)", bar: "var(--color-accent)" },
+        { no: "3", judul: "Tinjau &amp; terapkan", detail: "Bandingkan usulan sebelum menimpa jadwal", warna: "color-mix(in srgb,var(--color-text) 45%,transparent)", bar: "var(--color-divider)" },
+      ],
+      batasanKeras: [
+        { teks: "Satu guru hanya di satu rombel per jam", asal: "sudah ada di schedulerActions", aktif: true },
+        { teks: "Maksimal dua jam mapel sama per hari", asal: "sudah ada di autoGeneratorService", aktif: true },
+        { teks: "Hormati jam berhalangan guru", asal: "sudah ada via TeacherConstraint", aktif: true },
+        { teks: "Satu ruang hanya untuk satu rombel per jam", asal: "perlu model Room", aktif: true },
+        { teks: "Mapel praktik hanya di lab yang sesuai", asal: "perlu kolom tipe ruang", aktif: true },
+      ],
+      batasanLunak: [
+        { teks: "Mapel berat di jam pagi", bobot: "Tinggi", nilai: 3 },
+        { teks: "Blok praktik minimal 3 jam berurutan", bobot: "Tinggi", nilai: 3 },
+        { teks: "Hindari jam kosong di tengah hari guru", bobot: "Sedang", nilai: 2 },
+        { teks: "Ratakan beban antar hari", bobot: "Rendah", nilai: 1 },
+      ],
+      hasilAngka: [
+        { angka: "288", label: "Blok terjadwal", warna: "var(--color-text)" },
+        { angka: "0", label: "Bentrok keras", warna: "var(--color-text)" },
+        { angka: "11", label: "Jam tidak tertempatkan", warna: "var(--color-accent-2-700)" },
+      ],
+      sisaJam: [
+        { kelas: "XI RPL 1", mapel: "Basis Data", guru: "Sinta Wulandari", sisa: "2 jam", sebab: "Batas dua jam per hari sudah tercapai di semua hari" },
+        { kelas: "XI TKJ 2", mapel: "Matematika", guru: "Retno Setyowati", sisa: "3 jam", sebab: "Kuota guru habis" },
+        { kelas: "XII RPL 2", mapel: "Projek Kreatif dan Kewirausahaan", guru: "Bagas Prakoso", sisa: "4 jam", sebab: "Guru berhalangan Jumat dan Sabtu" },
+        { kelas: "X RPL 1", mapel: "Bahasa Inggris", guru: "Laras Ayuningtyas", sisa: "2 jam", sebab: "Slot kelas sudah penuh" },
+      ],
+
+      kertasKerja: [
+        { kelas: "XI RPL 1", mapel: "Basis Data", guru: "Sinta Wulandari", beban: "6 jam", terjadwal: "4 / 6", tagClass: "tag tag-accent-2" },
+        { kelas: "XI RPL 1", mapel: "Pemrograman Berorientasi Objek", guru: "Dwi Hartanto", beban: "5 jam", terjadwal: "5 / 5", tagClass: "tag tag-accent" },
+        { kelas: "XI RPL 1", mapel: "Matematika", guru: "Retno Setyowati", beban: "4 jam", terjadwal: "4 / 4", tagClass: "tag tag-accent" },
+        { kelas: "XI RPL 1", mapel: "Bahasa Indonesia", guru: "Anwar Hidayat", beban: "3 jam", terjadwal: "4 / 3", tagClass: "tag tag-accent-2" },
+        { kelas: "XI RPL 1", mapel: "Projek Kreatif dan Kewirausahaan", guru: "Bagas Prakoso", beban: "5 jam", terjadwal: "5 / 5", tagClass: "tag tag-accent" },
+        { kelas: "XI RPL 2", mapel: "Basis Data", guru: "Sinta Wulandari", beban: "6 jam", terjadwal: "6 / 6", tagClass: "tag tag-accent" },
+        { kelas: "XI RPL 2", mapel: "Projek Kreatif dan Kewirausahaan", guru: "Bagas Prakoso", beban: "5 jam", terjadwal: "3 / 5", tagClass: "tag tag-accent-2" },
+        { kelas: "X TKJ 1", mapel: "Informatika", guru: "Dwi Hartanto", beban: "4 jam", terjadwal: "4 / 4", tagClass: "tag tag-accent" },
+        { kelas: "X TKJ 1", mapel: "Projek IPAS", guru: "Ayu Kartika", beban: "2 jam", terjadwal: "2 / 2", tagClass: "tag tag-accent" },
+      ],
+
+      guruList: [
+        { nama: "Retno Setyowati", mapel: "Matematika, MTK Lanjut", kelas: "8", jam: "32", kuota: "kuota 30", persen: "100%", warna: "var(--color-accent-2-700)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Dwi Hartanto", mapel: "PBO, Pemrograman Web", kelas: "6", jam: "27", kuota: "kuota 30", persen: "90%", warna: "var(--color-accent)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Sinta Wulandari", mapel: "Basis Data", kelas: "4", jam: "24", kuota: "kuota 30", persen: "80%", warna: "var(--color-accent)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Laras Ayuningtyas", mapel: "Bahasa Inggris", kelas: "8", jam: "23", kuota: "kuota 30", persen: "77%", warna: "var(--color-accent)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Anwar Hidayat", mapel: "Bahasa Indonesia", kelas: "7", jam: "21", kuota: "kuota 30", persen: "70%", warna: "var(--color-accent)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Bagas Prakoso", mapel: "PKK, Produk Kreatif", kelas: "5", jam: "21", kuota: "kuota 30", persen: "70%", warna: "var(--color-accent)", status: "Aktif", tagClass: "tag tag-accent" },
+        { nama: "Yusuf Anwari", mapel: "—", kelas: "0", jam: "0", kuota: "kuota 30", persen: "0%", warna: "var(--color-neutral-400)", status: "Nonaktif", tagClass: "tag tag-neutral" },
+      ],
+      izinBaris: [1, 2, 3, 4, 5, 6, 7, 8].map(jam => ({
+        jam,
+        sel: HARI.map(([k]) => ({ latar: izinTidakBisa[k + "-" + jam] ? "var(--color-neutral-300)" : "var(--color-accent-200)" })),
+      })),
+
+      mapelList: [
+        { nama: "Pendidikan Agama dan Budi Pekerti", kode: "PAI", kelompok: "Umum", tagClass: "tag tag-neutral", target: "3 jam", ruang: "Kelas biasa", warnaRuang: "inherit", blok: "1 jam" },
+        { nama: "Matematika", kode: "MTK", kelompok: "Umum", tagClass: "tag tag-neutral", target: "4 jam", ruang: "Kelas biasa", warnaRuang: "inherit", blok: "2 jam" },
+        { nama: "Bahasa Indonesia", kode: "BIN", kelompok: "Umum", tagClass: "tag tag-neutral", target: "3 jam", ruang: "Kelas biasa", warnaRuang: "inherit", blok: "2 jam" },
+        { nama: "Bahasa Inggris", kode: "BIG", kelompok: "Umum", tagClass: "tag tag-neutral", target: "3 jam", ruang: "Kelas biasa", warnaRuang: "inherit", blok: "1 jam" },
+        { nama: "Projek IPAS", kode: "IPAS", kelompok: "Umum", tagClass: "tag tag-neutral", target: "2 jam", ruang: "Kelas biasa", warnaRuang: "inherit", blok: "2 jam" },
+        { nama: "Pemrograman Berorientasi Objek", kode: "PBO", kelompok: "Konsentrasi", tagClass: "tag tag-accent", target: "5 jam", ruang: "Lab RPL", warnaRuang: "var(--color-accent-700)", blok: "3 jam" },
+        { nama: "Basis Data", kode: "BD", kelompok: "Konsentrasi", tagClass: "tag tag-accent", target: "6 jam", ruang: "Lab RPL", warnaRuang: "var(--color-accent-700)", blok: "2 jam" },
+        { nama: "Projek Kreatif dan Kewirausahaan", kode: "PKK", kelompok: "Konsentrasi", tagClass: "tag tag-accent", target: "5 jam", ruang: "Lab RPL", warnaRuang: "var(--color-accent-700)", blok: "3 jam" },
+        { nama: "Mapel Pilihan: Desain Grafis", kode: "PIL-DG", kelompok: "Pilihan", tagClass: "tag tag-outline", target: "2 jam", ruang: "Lab Multimedia", warnaRuang: "var(--color-accent-700)", blok: "2 jam" },
+      ],
+
+      kelasList: [
+        { nama: "X RPL 1", tingkat: "X", siswa: "36", wali: "Rian Nugroho" },
+        { nama: "X TKJ 1", tingkat: "X", siswa: "35", wali: "Fauzi Rahman" },
+        { nama: "XI RPL 1", tingkat: "XI", siswa: "36", wali: "Sinta Wulandari" },
+        { nama: "XI RPL 2", tingkat: "XI", siswa: "34", wali: "Bagas Prakoso" },
+        { nama: "XI TKJ 2", tingkat: "XI", siswa: "33", wali: "Laras Ayuningtyas" },
+        { nama: "XII AKL 1", tingkat: "XII", siswa: "32", wali: "Retno Setyowati" },
+        { nama: "XII RPL 1", tingkat: "XII", siswa: "35", wali: "Wida Kusuma" },
+      ],
+      ruangList: [
+        { nama: "Lab RPL 1", tipe: "Lab RPL", tagClass: "tag tag-accent", kapasitas: "36", gedung: "B", persen: "94%", pakai: "45 dari 48 jam", warna: "var(--color-accent-2-700)" },
+        { nama: "Lab RPL 2", tipe: "Lab RPL", tagClass: "tag tag-accent", kapasitas: "36", gedung: "B", persen: "83%", pakai: "40 dari 48 jam", warna: "var(--color-accent)" },
+        { nama: "Lab Multimedia", tipe: "Lab MM", tagClass: "tag tag-accent", kapasitas: "32", gedung: "B", persen: "52%", pakai: "25 dari 48 jam", warna: "var(--color-accent)" },
+        { nama: "Lab TKJ", tipe: "Lab TKJ", tagClass: "tag tag-accent", kapasitas: "32", gedung: "C", persen: "71%", pakai: "34 dari 48 jam", warna: "var(--color-accent)" },
+        { nama: "R. 11", tipe: "Kelas biasa", tagClass: "tag tag-neutral", kapasitas: "36", gedung: "A", persen: "96%", pakai: "46 dari 48 jam", warna: "var(--color-accent-2-700)" },
+        { nama: "R. Seni", tipe: "Khusus", tagClass: "tag tag-neutral", kapasitas: "40", gedung: "A", persen: "33%", pakai: "16 dari 48 jam", warna: "var(--color-accent)" },
+        { nama: "Lapangan", tipe: "Luar ruang", tagClass: "tag tag-neutral", kapasitas: "120", gedung: "—", persen: "60%", pakai: "29 dari 48 jam", warna: "var(--color-accent)" },
+      ],
+
+      bentrokPenuh: [
+        { ikon: "ph-user-focus", jenis: "Guru ganda", kapan: "Selasa · Jam 7–8", jam: "11.00–12.20", judul: "Bagas Prakoso dijadwalkan di dua rombel sekaligus", uraian: "Projek Kreatif dan Kewirausahaan di XI RPL 1 (Lab RPL 2) dan Produk Kreatif di XI RPL 2 (Lab RPL 1). Keduanya butuh blok berurutan.", kode: "C01 · sudah divalidasi assignScheduleSlot", warna: "var(--color-accent-2-700)", garisAtas: "var(--color-text)", aksi1: "Pindahkan XI RPL 2 ke Rabu Jam 7–8", aksi2: "Ganti pengampu ke Rian Nugroho" },
+        { ikon: "ph-door-open", jenis: "Ruang ganda", kapan: "Kamis · Jam 1–2", jam: "07.00–08.20", judul: "Lab RPL 1 dipesan dua rombel", uraian: "Pemrograman Web XI RPL 1 dan Pemrograman Dasar X RPL 2. Kapasitas lab 36 kursi, total permintaan 68 siswa.", kode: "C02 · perlu model Room dan roomId di Schedule", warna: "var(--color-accent-2-700)", garisAtas: "var(--color-divider)", aksi1: "Pindahkan X RPL 2 ke Lab RPL 2", aksi2: "Geser ke Kamis Jam 5–6" },
+        { ikon: "ph-scales", jenis: "Kuota jam", kapan: "Sepanjang minggu", jam: "", judul: "Retno Setyowati 32 jam dari kuota 30 jam", uraian: "Mengampu Matematika di 6 rombel dan Matematika Tingkat Lanjut di 2 rombel. Kelebihan 2 jam perlu dialihkan atau kuota dinaikkan.", kode: "S01 · kolom kuota belum ada di model Teacher", warna: "var(--color-text)", garisAtas: "var(--color-divider)", aksi1: "Alihkan 2 jam ke Hana Prameswari", aksi2: "Ajukan penambahan kuota" },
+        { ikon: "ph-calendar-x", jenis: "Berhalangan", kapan: "Jumat · Jam 1–2", jam: "07.00–08.20", judul: "Ayu Kartika dijadwalkan pada jam berhalangan", uraian: "Terdaftar tugas belajar setiap Jumat pagi di TeacherConstraint, tetapi slot ini dibuat manual sehingga lolos pemeriksaan generator.", kode: "C05 · validasi manual belum memeriksa TeacherConstraint", warna: "var(--color-text)", garisAtas: "var(--color-divider)", aksi1: "Pindahkan ke Jumat Jam 3–4", aksi2: "Hapus izin Jumat pagi" },
+      ],
+
+      laporanList: [
+        { judul: "Jadwal per rombel", detail: "Satu halaman per kelas, siap ditempel di papan pengumuman kelas.", warna: "var(--color-accent)", ikon: "ph-chalkboard" },
+        { judul: "Jadwal per guru", detail: "Kartu mengajar tiap guru untuk seluruh tahun ajaran aktif.", warna: "var(--color-accent)", ikon: "ph-identification-card" },
+        { judul: "Rekap beban mengajar", detail: "Jumlah jam per guru dibanding kuota, untuk keperluan sertifikasi.", warna: "var(--color-accent)", ikon: "ph-scales" },
+        { judul: "Pemakaian ruang", detail: "Tingkat pemakaian tiap lab dan kelas per jam, untuk usulan penambahan ruang.", warna: "var(--color-accent-2)", ikon: "ph-door-open" },
+        { judul: "Pemenuhan jam kurikulum", detail: "Selisih jam terjadwal terhadap target tiap mapel di tiap rombel.", warna: "var(--color-accent)", ikon: "ph-target" },
+        { judul: "Audit perubahan", detail: "Riwayat lengkap AuditLog untuk periode yang dipilih.", warna: "var(--color-accent)", ikon: "ph-clock-counter-clockwise" },
+      ],
+      rekapList: [
+        { nama: "Retno Setyowati", kuota: "30", jadwal: "32", selisih: "+2", warna: "var(--color-accent-2-700)", rombel: "8", mapel: "2", status: "Kelebihan", tagClass: "tag tag-accent-2" },
+        { nama: "Dwi Hartanto", kuota: "30", jadwal: "27", selisih: "−3", warna: "var(--color-text)", rombel: "6", mapel: "2", status: "Sesuai", tagClass: "tag tag-accent" },
+        { nama: "Sinta Wulandari", kuota: "30", jadwal: "24", selisih: "−6", warna: "var(--color-text)", rombel: "4", mapel: "1", status: "Sesuai", tagClass: "tag tag-accent" },
+        { nama: "Laras Ayuningtyas", kuota: "30", jadwal: "23", selisih: "−7", warna: "var(--color-text)", rombel: "8", mapel: "1", status: "Sesuai", tagClass: "tag tag-accent" },
+        { nama: "Ayu Kartika", kuota: "24", jadwal: "18", selisih: "−6", warna: "var(--color-text)", rombel: "9", mapel: "1", status: "Kurang", tagClass: "tag tag-neutral" },
+        { nama: "Bagas Prakoso", kuota: "30", jadwal: "21", selisih: "−9", warna: "var(--color-text)", rombel: "5", mapel: "2", status: "Kurang", tagClass: "tag tag-neutral" },
+      ],
+
+      auditPenuh: [
+        { ikon: "ph-lightning", aksi: "AUTO GENERATE SCHEDULE", oleh: "Auto Generator Algorithm", detail: "288 blok jadwal dibuat untuk 6 rombel kelas XI. 11 jam tidak dapat ditempatkan pada 4 penugasan.", waktu: "23 Agu 2026, 09.14" },
+        { ikon: "ph-arrows-left-right", aksi: "SCHEDULE SLOT ASSIGN", oleh: "Dwi Astuti", detail: "Basis Data XI RPL 1 dipindah dari Rabu Jam 7 ke Rabu Jam 5. Slot lama ditutup dengan validUntil.", waktu: "23 Agu 2026, 08.52" },
+        { ikon: "ph-hand-arrow-down", aksi: "TEACHER HANDOVER", oleh: "Dwi Astuti", detail: "Guru Yusuf Anwari digantikan oleh Hana Prameswari. Mempengaruhi 18 jadwal aktif. Berlaku mulai 1 Agustus 2026.", waktu: "22 Agu 2026, 15.31" },
+        { ikon: "ph-lock-simple", aksi: "SCHEDULE LOCK", oleh: "Dwi Astuti", detail: "Rombel X TKJ 1 dikunci. Perubahan selanjutnya memerlukan persetujuan kepala sekolah.", waktu: "22 Agu 2026, 14.05" },
+        { ikon: "ph-calendar-x", aksi: "TEACHER CONSTRAINT", oleh: "Ayu Kartika", detail: "Menandai Jumat Jam 1–2 sebagai jam berhalangan karena tugas belajar.", waktu: "21 Agu 2026, 10.47" },
+        { ikon: "ph-books", aksi: "SUBJECT UPDATE", oleh: "Dwi Astuti", detail: "Target jam Basis Data diubah dari 5 menjadi 6 jam per minggu.", waktu: "20 Agu 2026, 16.20" },
+      ],
+
+      agendaPonsel: [
+        { mulai: "07.00", jam: "1–2", mapel: "Pemrograman Berorientasi Objek", detail: "X RPL 2 · Lab RPL 1", opasitas: ".45" },
+        { mulai: "08.20", jam: "3", mapel: "Jam kosong", detail: "Tidak ada jadwal mengajar", opasitas: ".45" },
+        { mulai: "09.00", jam: "4", mapel: "Informatika", detail: "X TKJ 1 · R. 4", opasitas: ".45" },
+        { mulai: "09.40", jam: "5–6", mapel: "Pemrograman Berorientasi Objek", detail: "XI RPL 1 · Lab RPL 1", opasitas: "1" },
+        { mulai: "11.00", jam: "7–8", mapel: "Pemrograman Web", detail: "XII RPL 2 · Lab RPL 1", opasitas: "1" },
+      ],
+      mingguPonsel: HARI.map(([k, l], i) => ({
+        hari: l,
+        warna: i === 1 ? "var(--color-accent-700)" : "var(--color-text)",
+        ringkas: i === 1 ? "hari ini" : (k === "FRIDAY" ? "5 jam" : k === "SATURDAY" ? "6 jam" : k === "WEDNESDAY" ? "6 jam" : "8 jam"),
+        mapel: (SPEC[k] || []).filter(e => e[2]).map(e => ({
+          nama: e[2].length > 22 ? e[2].slice(0, 20) + "…" : e[2],
+          tagClass: e[5] === "praktik" || e[5] === "bentrokGuru" || e[5] === "bentrokRuang" ? "tag tag-accent" : "tag tag-neutral",
+        })),
+      })),
+    };
+  }
+}
+</script>
+</body>
+</html>

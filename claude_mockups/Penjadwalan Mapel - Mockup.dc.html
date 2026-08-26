@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/broadsheet-377fdc6a-c24e-432c-926b-b1df1963c0e3/styles.css">
+<script src="_ds/broadsheet-377fdc6a-c24e-432c-926b-b1df1963c0e3/_ds_bundle.js"></script>
+<style>
+body{margin:0;background:#e6e4e1}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#201e1d;color:#f3f2f2;border-radius:2px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 var(--font-heading);color:#201e1d}
+.dv-opts{display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#201e1d;border-radius:2px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 var(--font-body);color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#f3f2f2;border-radius:2px;box-shadow:0 2px 14px rgba(32,30,29,.13);overflow:hidden}
+.dv-opt:target .dv-oid{background:#0088b0;color:#f3f2f2}
+.dv-next{margin:26px 0 0;font:12.5px/1.6 var(--font-body);color:rgba(0,0,0,.5)}
+.tt td{vertical-align:top;border-left:1px solid color-mix(in srgb,var(--color-text) 8%,transparent);padding:6px 8px}
+.tt th{border-left:1px solid color-mix(in srgb,var(--color-text) 8%,transparent);padding:8px}
+.tt td:first-child,.tt th:first-child{border-left:0}
+.tt tbody tr:hover{background:none}
+</style></helmet>
+
+<section class="dv-turn" id="t0" style="background:#f3f2f2">
+  <div style="max-width:920px">
+    <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px">
+      <span style="font:600 10.5px/1 var(--font-heading);letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-700)">Blueprint UI</span>
+      <span style="font-size:11.5px;opacity:.5">Draf 1 · untuk ditinjau</span>
+    </div>
+    <h1 style="font-size:52px;margin:0 0 18px;letter-spacing:-.025em">Sistem Penjadwalan Mata Pelajaran</h1>
+    <p style="font-size:17px;line-height:1.6;max-width:60ch;margin:0 0 30px">Sembilan layar acuan untuk dilampirkan ke sistem full-stack Anda: alur admin kurikulum menyusun jadwal, mesin generate otomatis, penanganan bentrok, sampai tampilan guru dan siswa.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:34px 40px;margin-bottom:34px">
+      <div>
+        <h6 style="margin:0 0 8px;color:var(--color-accent-700)">Asumsi yang saya pakai</h6>
+        <ul style="margin:0;padding-left:16px;font-size:13.5px;line-height:1.65">
+          <li>Jenjang SMK, 6 hari sekolah, 8 JP/hari + istirahat &amp; ISHOMA</li>
+          <li>Peran: Admin Kurikulum, Guru, Siswa</li>
+          <li>Skala sedang: ±24 rombel, ±45 guru, 12 ruang termasuk lab</li>
+          <li>Desktop-first untuk admin, mobile untuk guru &amp; siswa</li>
+          <li>Bahasa Indonesia, istilah JP (jam pelajaran) dan rombel</li>
+        </ul>
+        <p style="font-size:12px;opacity:.55;margin:10px 0 0">Formulir pertanyaan ditutup tanpa jawaban, jadi ini tebakan saya. Koreksi mana yang meleset.</p>
+      </div>
+      <div>
+        <h6 style="margin:0 0 8px;color:var(--color-accent-700)">Keputusan desain</h6>
+        <ul style="margin:0;padding-left:16px;font-size:13.5px;line-height:1.65">
+          <li><b>Papan jadwal jadi pusat.</b> Semua jalan menuju satu grid mingguan yang bisa disusun langsung.</li>
+          <li><b>Bentrok tampil di tempat kejadian</b>, bukan cuma di halaman laporan terpisah.</li>
+          <li><b>Generate otomatis adalah usulan</b>, bukan keputusan. Admin selalu menyetujui manual.</li>
+          <li><b>Satu sumber kebenaran</b>: ketersediaan guru dan kapasitas ruang dikunci di master data.</li>
+        </ul>
+      </div>
+      <div>
+        <h6 style="margin:0 0 8px;color:var(--color-accent-700)">Yang belum diputuskan</h6>
+        <ul style="margin:0;padding-left:16px;font-size:13.5px;line-height:1.65">
+          <li>Algoritma generate (greedy, constraint solver, atau genetic) — UI-nya sudah netral terhadap pilihan itu</li>
+          <li>Apakah orang tua perlu akses</li>
+          <li>Integrasi presensi &amp; Dapodik</li>
+          <li>Multi-shift pagi/siang</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="tag tag-outline" href="#1a" style="text-decoration:none">1a Beranda admin</a>
+      <a class="tag tag-outline" href="#1b" style="text-decoration:none">1b Papan jadwal</a>
+      <a class="tag tag-outline" href="#1c" style="text-decoration:none">1c Generate otomatis</a>
+      <a class="tag tag-outline" href="#1d" style="text-decoration:none">1d Pusat bentrok</a>
+      <a class="tag tag-outline" href="#1e" style="text-decoration:none">1e Master mapel</a>
+      <a class="tag tag-outline" href="#1f" style="text-decoration:none">1f Beban &amp; ketersediaan guru</a>
+      <a class="tag tag-outline" href="#1g" style="text-decoration:none">1g Jadwal guru</a>
+      <a class="tag tag-outline" href="#1h" style="text-decoration:none">1h Jadwal siswa (mobile)</a>
+      <a class="tag tag-outline" href="#1i" style="text-decoration:none">1i Peta layar &amp; entitas</a>
+    </div>
+  </div>
+</section>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Set layar lengkap — admin, guru, siswa</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Beranda admin kurikulum — status penyusunan per rombel</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1a" style="color:var(--color-accent);text-decoration:none;font-weight:600">Beranda</a>
+      <a href="#1b" style="color:inherit;text-decoration:none">Papan Jadwal</a>
+      <a href="#1d" style="color:inherit;text-decoration:none">Bentrok</a>
+      <a href="#1e" style="color:inherit;text-decoration:none">Master Data</a>
+      <a href="#1f" style="color:inherit;text-decoration:none">Guru</a>
+      <a href="#1a" style="color:inherit;text-decoration:none">Laporan</a>
+    </nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;opacity:.6">
+      <span>T.A. 2026/2027 · Semester Ganjil</span>
+      <span style="width:1px;height:14px;background:currentColor;opacity:.3"></span>
+      <span>Dwi Astuti · Waka Kurikulum</span>
+    </div>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:30px;display:grid;grid-template-columns:1fr 320px;gap:44px">
+    <div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px">
+        <div>
+          <h2 style="font-size:34px;margin:0 0 4px;letter-spacing:-.02em">Penyusunan jadwal ganjil</h2>
+          <p style="margin:0;font-size:13.5px;opacity:.6">Batas kunci jadwal 12 Juli 2026 · tersisa 9 hari</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <a class="btn btn-secondary" href="#1c">Generate otomatis</a>
+          <a class="btn btn-primary" href="#1b">Buka papan jadwal</a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:34px">
+        <div style="padding-right:20px">
+          <div style="font:600 46px/1 var(--font-heading);letter-spacing:-.03em">18<span style="font-size:20px;opacity:.4">/24</span></div>
+          <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:6px">Rombel terjadwal penuh</div>
+        </div>
+        <div style="padding-right:20px;border-left:1px solid var(--color-divider);padding-left:20px">
+          <div style="font:600 46px/1 var(--font-heading);letter-spacing:-.03em;color:var(--color-accent-2-700)">7</div>
+          <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:6px">Bentrok belum selesai</div>
+        </div>
+        <div style="padding-right:20px;border-left:1px solid var(--color-divider);padding-left:20px">
+          <div style="font:600 46px/1 var(--font-heading);letter-spacing:-.03em">96<span style="font-size:20px;opacity:.4">%</span></div>
+          <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:6px">JP kurikulum terpenuhi</div>
+        </div>
+        <div style="border-left:1px solid var(--color-divider);padding-left:20px">
+          <div style="font:600 46px/1 var(--font-heading);letter-spacing:-.03em">4</div>
+          <div style="font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:6px">Guru melebihi kuota jam</div>
+        </div>
+      </div>
+
+      <h6 style="margin:0 0 4px">Status per rombel</h6>
+      <table class="table">
+        <thead><tr><th style="width:20%">Rombel</th><th style="width:16%">Wali kelas</th><th style="width:12%">JP terisi</th><th>Progres</th><th style="width:16%">Status</th><th style="width:10%"></th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600">X TKJ 1</td><td>Fauzi Rahman</td><td>46 / 46</td>
+            <td><div style="height:6px;background:var(--color-neutral-200);border-radius:1px"><div style="width:100%;height:6px;background:var(--color-accent);border-radius:1px"></div></div></td>
+            <td><span class="tag tag-accent">Terkunci</span></td>
+            <td style="text-align:right"><a class="btn btn-ghost" href="#1b">Lihat</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">XI RPL 1</td><td>Sinta Wulandari</td><td>44 / 48</td>
+            <td><div style="height:6px;background:var(--color-neutral-200);border-radius:1px"><div style="width:91%;height:6px;background:var(--color-accent);border-radius:1px"></div></div></td>
+            <td><span class="tag tag-accent-2">2 bentrok</span></td>
+            <td style="text-align:right"><a class="btn btn-ghost" href="#1b">Perbaiki</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">XI RPL 2</td><td>Bagas Prakoso</td><td>45 / 48</td>
+            <td><div style="height:6px;background:var(--color-neutral-200);border-radius:1px"><div style="width:94%;height:6px;background:var(--color-accent);border-radius:1px"></div></div></td>
+            <td><span class="tag tag-accent-2">1 bentrok</span></td>
+            <td style="text-align:right"><a class="btn btn-ghost" href="#1b">Perbaiki</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">XI TKJ 2</td><td>Laras Ayuningtyas</td><td>39 / 48</td>
+            <td><div style="height:6px;background:var(--color-neutral-200);border-radius:1px"><div style="width:81%;height:6px;background:var(--color-accent);border-radius:1px"></div></div></td>
+            <td><span class="tag tag-neutral">Draf</span></td>
+            <td style="text-align:right"><a class="btn btn-ghost" href="#1b">Lanjutkan</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">XII AKL 1</td><td>Retno Setyowati</td><td>48 / 48</td>
+            <td><div style="height:6px;background:var(--color-neutral-200);border-radius:1px"><div style="width:100%;height:6px;background:var(--color-accent);border-radius:1px"></div></div></td>
+            <td><span class="tag tag-neutral">Menunggu verifikasi</span></td>
+            <td style="text-align:right"><a class="btn btn-ghost" href="#1b">Tinjau</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <aside style="display:flex;flex-direction:column;gap:28px">
+      <div>
+        <h6 style="margin:0 0 10px">Perlu perhatian</h6>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <a href="#1d" style="display:block;text-decoration:none;color:inherit;border-left:2px solid var(--color-accent-2);padding-left:12px">
+            <div style="font:600 14px/1.3 var(--font-heading)">Bagas Prakoso mengajar dua rombel di jam yang sama</div>
+            <div style="font-size:11.5px;opacity:.6;margin-top:3px">Selasa JP 7–8 · XI RPL 1 dan XI RPL 2</div>
+          </a>
+          <a href="#1d" style="display:block;text-decoration:none;color:inherit;border-left:2px solid var(--color-accent-2);padding-left:12px">
+            <div style="font:600 14px/1.3 var(--font-heading)">Lab RPL 1 dipesan dua kelas</div>
+            <div style="font-size:11.5px;opacity:.6;margin-top:3px">Kamis JP 1–2 · kapasitas 36, permintaan 68</div>
+          </a>
+          <a href="#1f" style="display:block;text-decoration:none;color:inherit;border-left:2px solid var(--color-accent);padding-left:12px">
+            <div style="font:600 14px/1.3 var(--font-heading)">Retno Setyowati 32 JP dari kuota 30</div>
+            <div style="font-size:11.5px;opacity:.6;margin-top:3px">Kelebihan 2 JP · perlu redistribusi</div>
+          </a>
+        </div>
+      </div>
+      <div>
+        <h6 style="margin:0 0 10px">Aktivitas terakhir</h6>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:12.5px">
+          <div><span style="opacity:.45">09.14</span> &nbsp;Generate otomatis dijalankan untuk 6 rombel kelas XI</div>
+          <div><span style="opacity:.45">08.52</span> &nbsp;Sinta W. memindahkan Basis Data ke Rabu JP 4–5</div>
+          <div><span style="opacity:.45">Kemarin</span> &nbsp;X TKJ 1 dikunci oleh Dwi Astuti</div>
+          <div><span style="opacity:.45">Kemarin</span> &nbsp;Ruang Lab Multimedia ditambahkan</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Papan jadwal — grid mingguan per rombel, susun dengan tarik-lepas</div>
+<div class="dv-card" style="width:1420px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1a" style="color:inherit;text-decoration:none">Beranda</a>
+      <a href="#1b" style="color:var(--color-accent);text-decoration:none;font-weight:600">Papan Jadwal</a>
+      <a href="#1d" style="color:inherit;text-decoration:none">Bentrok</a>
+      <a href="#1e" style="color:inherit;text-decoration:none">Master Data</a>
+      <a href="#1f" style="color:inherit;text-decoration:none">Guru</a>
+      <a href="#1a" style="color:inherit;text-decoration:none">Laporan</a>
+    </nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px;font-size:12px;opacity:.6"><span>T.A. 2026/2027 · Semester Ganjil</span></div>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:24px 30px 12px;display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:2px">Rombel</div>
+      <h2 style="font-size:30px;margin:0;letter-spacing:-.02em">XI RPL 1 <span style="font-size:15px;font-weight:400;opacity:.5">· 36 siswa · wali kelas Sinta Wulandari</span></h2>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+      <div class="seg">
+        <label class="seg-opt"><input type="radio" name="lihat" checked style="position:absolute;opacity:0">Per rombel</label>
+        <label class="seg-opt"><input type="radio" name="lihat" style="position:absolute;opacity:0">Per guru</label>
+        <label class="seg-opt"><input type="radio" name="lihat" style="position:absolute;opacity:0">Per ruang</label>
+      </div>
+      <button class="btn btn-secondary" type="button">Ekspor</button>
+      <button class="btn btn-primary" type="button">Simpan &amp; kunci</button>
+    </div>
+  </div>
+
+  <sc-if value="{{ tampilkanBentrok }}" hint-placeholder-val="{{ true }}">
+    <div style="margin:8px 30px 0;padding:11px 16px;background:var(--color-accent-2-100);display:flex;align-items:center;gap:14px">
+      <span style="font:600 13.5px/1.3 var(--font-heading);color:var(--color-accent-2-800)">2 bentrok di rombel ini</span>
+      <span style="font-size:12.5px;color:var(--color-accent-2-800);opacity:.85">Selasa JP 7–8 guru tumpang tindih · Kamis JP 1–2 lab penuh</span>
+      <a class="btn btn-ghost" href="#1d" style="margin-left:auto;color:var(--color-accent-2-700)">Buka pusat bentrok</a>
+    </div>
+  </sc-if>
+
+  <div style="padding:20px 30px 30px;display:grid;grid-template-columns:1fr 292px;gap:30px;align-items:start">
+    <table class="table tt" style="table-layout:fixed">
+      <thead>
+        <tr>
+          <th style="width:78px">Jam</th>
+          <th>Senin</th><th>Selasa</th><th>Rabu</th><th>Kamis</th><th>Jumat</th><th>Sabtu</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 1<br>07.00</td>
+          <td style="background:var(--color-neutral-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Upacara Bendera</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Seluruh sekolah · Lapangan</div>
+          </td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Bahasa Indonesia</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Anwar Hidayat</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Matematika</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Retno Setyowati</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+          <td rowspan="2" style="background:var(--color-accent-2-100);box-shadow:inset 2px 0 0 var(--color-accent-2)">
+            <div style="display:flex;align-items:baseline;gap:6px">
+              <div style="font:600 12.5px/1.25 var(--font-heading);color:var(--color-accent-2-900)">Pemrograman Web</div>
+            </div>
+            <div style="font-size:10.5px;color:var(--color-accent-2-900);opacity:.7;margin-top:2px">Dwi Hartanto</div>
+            <div style="font-size:10.5px;color:var(--color-accent-2-900);opacity:.7">Lab RPL 1 · 2 JP</div>
+            <div style="margin-top:5px"><span class="tag tag-accent-2" style="font-size:9.5px;padding:2px 6px">Lab bentrok</span></div>
+          </td>
+          <td rowspan="2" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Projek IPAS</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Ayu Kartika</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+          <td rowspan="3" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Projek Kreatif &amp; Kewirausahaan</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Bagas Prakoso</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 2 · 3 JP</div>
+            <div style="margin-top:6px"><span class="tag tag-accent" style="font-size:9.5px;padding:2px 6px">Blok praktik</span></div>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 2<br>07.45</td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Matematika</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Retno Setyowati</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 3<br>08.30</td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">PPKn</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Yuni Astari · R. 11</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">PJOK</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Gilang Saputra · Lapangan</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Bahasa Inggris</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Laras Ayuningtyas · R. 11</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Bahasa Indonesia</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Anwar Hidayat · R. 11</div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7" style="padding:5px 8px;background:var(--color-neutral-100);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;text-align:center">Istirahat · 09.15–09.30</td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 4<br>09.30</td>
+          <td rowspan="2" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Pemrograman Berorientasi Objek</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Dwi Hartanto</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 1 · 2 JP</div>
+          </td>
+          <td rowspan="3" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Pemrograman Berorientasi Objek</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Dwi Hartanto</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 1 · 3 JP</div>
+          </td>
+          <td rowspan="2" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Basis Data</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sinta Wulandari</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 2 · 2 JP</div>
+          </td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Matematika Tingkat Lanjut</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Retno Setyowati</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+          <td rowspan="2" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Basis Data</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sinta Wulandari</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 2 · 2 JP</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Bimbingan Konseling</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Yuni Astari · R. 11</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 5<br>10.15</td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Mapel Pilihan: Desain Grafis</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Rian Nugroho</div>
+            <div style="font-size:10.5px;opacity:.55">Lab Multimedia · 2 JP</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 6<br>11.00</td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Bahasa Inggris</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Laras Ayuningtyas · R. 11</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Sejarah</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Wida Kusuma · R. 11</div>
+          </td>
+          <td>
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Seni Budaya</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Ratih Purnama · R. Seni</div>
+          </td>
+          <td style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)">
+            <div style="font-size:10.5px;opacity:.5;line-height:1.35">Jumat berakhir 11.30</div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7" style="padding:5px 8px;background:var(--color-neutral-100);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;text-align:center">ISHOMA · 11.45–12.30</td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55;line-height:1.35">JP 7<br>12.30</td>
+          <td rowspan="2" style="background:var(--color-accent-100)">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Basis Data</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sinta Wulandari</div>
+            <div style="font-size:10.5px;opacity:.55">Lab RPL 2 · 2 JP</div>
+          </td>
+          <td rowspan="2" style="background:var(--color-accent-2-100);box-shadow:inset 2px 0 0 var(--color-accent-2)">
+            <div style="font:600 12.5px/1.25 var(--font-heading);color:var(--color-accent-2-900)">Projek Kreatif &amp; Kewirausahaan</div>
+            <div style="font-size:10.5px;color:var(--color-accent-2-900);opacity:.7;margin-top:2px">Bagas Prakoso</div>
+            <div style="font-size:10.5px;color:var(--color-accent-2-900);opacity:.7">Lab RPL 2 · 2 JP</div>
+            <div style="margin-top:5px"><span class="tag tag-accent-2" style="font-size:9.5px;padding:2px 6px">Guru bentrok</span></div>
+            <div style="font-size:10px;color:var(--color-accent-2-900);opacity:.75;margin-top:5px;line-height:1.35">Juga mengajar XI RPL 2 di jam ini</div>
+          </td>
+          <td rowspan="2" style="background:color-mix(in srgb,var(--color-accent) 6%,transparent);border:1px dashed var(--color-accent-400)">
+            <div style="font-size:11px;color:var(--color-accent-700);line-height:1.4;font-weight:600">Slot kosong · 2 JP</div>
+            <div style="font-size:10.5px;color:var(--color-accent-700);opacity:.8;margin-top:3px">Lepas mapel di sini</div>
+          </td>
+          <td rowspan="2">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Pendidikan Agama &amp; Budi Pekerti</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Fauzi Rahman</div>
+            <div style="font-size:10.5px;opacity:.55">R. 11 · 2 JP</div>
+          </td>
+          <td rowspan="2" style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)"></td>
+          <td rowspan="2" style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)">
+            <div style="font-size:10.5px;opacity:.5;line-height:1.35">Sabtu berakhir 11.45</div>
+          </td>
+        </tr>
+        <tr><td style="font-size:11px;opacity:.55;line-height:1.35">JP 8<br>13.15</td></tr>
+      </tbody>
+    </table>
+
+    <aside style="display:flex;flex-direction:column;gap:26px">
+      <div>
+        <h6 style="margin:0 0 4px">Belum terjadwal</h6>
+        <p style="font-size:11.5px;opacity:.55;margin:0 0 12px">Tarik ke slot kosong di papan</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:9px 11px;background:var(--color-surface);border-left:2px solid var(--color-accent);cursor:grab">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Informatika</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sisa 2 JP · Dwi Hartanto</div>
+          </div>
+          <div style="padding:9px 11px;background:var(--color-surface);border-left:2px solid var(--color-accent);cursor:grab">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">Sejarah</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sisa 1 JP · Wida Kusuma</div>
+          </div>
+          <div style="padding:9px 11px;background:var(--color-surface);border-left:2px solid var(--color-accent);cursor:grab">
+            <div style="font:600 12.5px/1.25 var(--font-heading)">PJOK</div>
+            <div style="font-size:10.5px;opacity:.55;margin-top:2px">Sisa 1 JP · Gilang Saputra</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h6 style="margin:0 0 10px">Saat menaruh mapel</h6>
+        <div style="font-size:12px;line-height:1.6;display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:9px"><span style="flex:none;width:14px;height:14px;margin-top:2px;background:color-mix(in srgb,var(--color-accent) 15%,transparent);border:1px dashed var(--color-accent-400)"></span><span>Slot valid — guru dan ruang bebas</span></div>
+          <div style="display:flex;gap:9px"><span style="flex:none;width:14px;height:14px;margin-top:2px;background:var(--color-accent-2-100);box-shadow:inset 2px 0 0 var(--color-accent-2)"></span><span>Bentrok — sistem tetap izinkan, tapi ditandai</span></div>
+          <div style="display:flex;gap:9px"><span style="flex:none;width:14px;height:14px;margin-top:2px;background:repeating-linear-gradient(135deg,transparent,transparent 4px,color-mix(in srgb,var(--color-text) 12%,transparent) 4px,color-mix(in srgb,var(--color-text) 12%,transparent) 8px)"></span><span>Terkunci — di luar jam sekolah</span></div>
+        </div>
+      </div>
+
+      <div>
+        <h6 style="margin:0 0 10px">Beban guru minggu ini</h6>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:12px">
+          <div>
+            <div style="display:flex;justify-content:space-between"><span>Dwi Hartanto</span><span style="opacity:.55">27/30 JP</span></div>
+            <div style="height:4px;background:var(--color-neutral-200);margin-top:4px"><div style="width:90%;height:4px;background:var(--color-accent)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between"><span>Retno Setyowati</span><span style="color:var(--color-accent-2-700)">32/30 JP</span></div>
+            <div style="height:4px;background:var(--color-neutral-200);margin-top:4px"><div style="width:100%;height:4px;background:var(--color-accent-2)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between"><span>Sinta Wulandari</span><span style="opacity:.55">24/30 JP</span></div>
+            <div style="height:4px;background:var(--color-neutral-200);margin-top:4px"><div style="width:80%;height:4px;background:var(--color-accent)"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between"><span>Bagas Prakoso</span><span style="opacity:.55">21/30 JP</span></div>
+            <div style="height:4px;background:var(--color-neutral-200);margin-top:4px"><div style="width:70%;height:4px;background:var(--color-accent)"></div></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Generate otomatis — batasan di kiri, usulan hasil di kanan</div>
+<div class="dv-card" style="width:1120px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <div style="font-size:13.5px;opacity:.55">Generate otomatis</div>
+    <div style="margin-left:auto;font-size:12px;opacity:.6">T.A. 2026/2027 · Semester Ganjil</div>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:28px 30px 34px;display:grid;grid-template-columns:400px 1fr;gap:44px;align-items:start">
+    <div>
+      <h2 style="font-size:28px;margin:0 0 6px;letter-spacing:-.02em">Batasan penjadwalan</h2>
+      <p style="font-size:13px;opacity:.6;margin:0 0 24px">Batasan keras tidak boleh dilanggar. Batasan lunak dipakai untuk menilai kualitas usulan.</p>
+
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:10px">Keras — wajib</div>
+      <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;font-size:13.5px">
+        <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" checked style="margin-top:4px;accent-color:var(--color-accent)"><span>Satu guru hanya di satu rombel per JP</span></label>
+        <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" checked style="margin-top:4px;accent-color:var(--color-accent)"><span>Satu ruang hanya untuk satu rombel per JP</span></label>
+        <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" checked style="margin-top:4px;accent-color:var(--color-accent)"><span>Mapel praktik hanya di lab yang sesuai</span></label>
+        <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" checked style="margin-top:4px;accent-color:var(--color-accent)"><span>Hormati hari tidak tersedia tiap guru</span></label>
+        <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" checked style="margin-top:4px;accent-color:var(--color-accent)"><span>Jangan isi jam istirahat, ISHOMA dan Jumat siang</span></label>
+      </div>
+
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:10px">Lunak — diusahakan</div>
+      <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:26px">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>Mapel berat di jam pagi</span><span style="opacity:.5">Tinggi</span></div>
+          <input type="range" min="0" max="3" value="3" style="width:100%;accent-color:var(--color-accent)">
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>Hindari jam kosong di tengah hari guru</span><span style="opacity:.5">Sedang</span></div>
+          <input type="range" min="0" max="3" value="2" style="width:100%;accent-color:var(--color-accent)">
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>Blok praktik minimal 3 JP berurutan</span><span style="opacity:.5">Tinggi</span></div>
+          <input type="range" min="0" max="3" value="3" style="width:100%;accent-color:var(--color-accent)">
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>Ratakan beban antar hari</span><span style="opacity:.5">Rendah</span></div>
+          <input type="range" min="0" max="3" value="1" style="width:100%;accent-color:var(--color-accent)">
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:18px">
+        <label>Cakupan</label>
+        <select class="input"><option>6 rombel kelas XI (belum terkunci)</option><option>Semua rombel</option><option>Pilih manual…</option></select>
+      </div>
+      <button class="btn btn-primary btn-block" type="button">Jalankan generate</button>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:4px">
+        <h3 style="font-size:22px;margin:0;letter-spacing:-.02em">Usulan 3 dari 3</h3>
+        <span class="tag tag-accent">Skor terbaik</span>
+      </div>
+      <p style="font-size:12.5px;opacity:.6;margin:0 0 22px">Selesai dalam 4,2 detik · 1.180 penempatan dievaluasi</p>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:26px">
+        <div style="padding-right:18px">
+          <div style="font:600 40px/1 var(--font-heading);letter-spacing:-.03em">94<span style="font-size:17px;opacity:.4">/100</span></div>
+          <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:5px">Skor kualitas</div>
+        </div>
+        <div style="border-left:1px solid var(--color-divider);padding-left:18px;padding-right:18px">
+          <div style="font:600 40px/1 var(--font-heading);letter-spacing:-.03em">0</div>
+          <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:5px">Pelanggaran keras</div>
+        </div>
+        <div style="border-left:1px solid var(--color-divider);padding-left:18px">
+          <div style="font:600 40px/1 var(--font-heading);letter-spacing:-.03em;color:var(--color-accent-2-700)">5</div>
+          <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.55;margin-top:5px">Batasan lunak terlewat</div>
+        </div>
+      </div>
+
+      <h6 style="margin:0 0 4px">Perbandingan usulan</h6>
+      <table class="table" style="margin-bottom:24px">
+        <thead><tr><th>Usulan</th><th>Skor</th><th>Pelanggaran keras</th><th>Lunak terlewat</th><th>Guru kelebihan jam</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Usulan 1</td><td>81</td><td>0</td><td>14</td><td>3</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Lihat</button></td></tr>
+          <tr><td>Usulan 2</td><td>88</td><td>0</td><td>9</td><td>1</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Lihat</button></td></tr>
+          <tr style="background:var(--color-accent-100)"><td style="font-weight:600">Usulan 3</td><td style="font-weight:600">94</td><td>0</td><td>5</td><td>0</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Sedang dilihat</button></td></tr>
+        </tbody>
+      </table>
+
+      <h6 style="margin:0 0 10px">Kompromi yang diambil sistem</h6>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+        <div style="border-left:2px solid var(--color-accent);padding-left:12px">
+          <div style="font:600 13.5px/1.3 var(--font-heading)">Matematika XI TKJ 2 jatuh di JP 7–8</div>
+          <div style="font-size:11.5px;opacity:.6;margin-top:2px">Melanggar "mapel berat di jam pagi" · alternatif pagi sudah terpakai PJOK bersama</div>
+        </div>
+        <div style="border-left:2px solid var(--color-accent);padding-left:12px">
+          <div style="font:600 13.5px/1.3 var(--font-heading)">Ayu Kartika punya jam kosong Rabu JP 4</div>
+          <div style="font-size:11.5px;opacity:.6;margin-top:2px">Melanggar "hindari jam kosong" · dibutuhkan agar Projek IPAS tidak pecah</div>
+        </div>
+        <div style="border-left:2px solid var(--color-accent);padding-left:12px">
+          <div style="font:600 13.5px/1.3 var(--font-heading)">Blok praktik XI RPL 2 dipecah 2+2 JP</div>
+          <div style="font-size:11.5px;opacity:.6;margin-top:2px">Lab RPL 2 tidak punya blok 4 JP kosong hari mana pun</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-secondary" type="button">Buang usulan</button>
+        <button class="btn btn-secondary" type="button">Terapkan sebagai draf</button>
+        <a class="btn btn-primary" href="#1b">Terapkan &amp; buka papan</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1d">
+<div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Pusat bentrok — setiap konflik punya usulan perbaikan sekali klik</div>
+<div class="dv-card" style="width:1120px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1a" style="color:inherit;text-decoration:none">Beranda</a>
+      <a href="#1b" style="color:inherit;text-decoration:none">Papan Jadwal</a>
+      <a href="#1d" style="color:var(--color-accent);text-decoration:none;font-weight:600">Bentrok</a>
+      <a href="#1e" style="color:inherit;text-decoration:none">Master Data</a>
+      <a href="#1f" style="color:inherit;text-decoration:none">Guru</a>
+    </nav>
+    <div style="margin-left:auto;font-size:12px;opacity:.6">T.A. 2026/2027 · Semester Ganjil</div>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:28px 30px 34px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h2 style="font-size:30px;margin:0 0 4px;letter-spacing:-.02em">7 bentrok belum selesai</h2>
+        <p style="margin:0;font-size:13px;opacity:.6">Dihitung ulang otomatis setiap perubahan tersimpan · terakhir 09.41</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <span class="tag tag-accent-2">4 guru</span>
+        <span class="tag tag-accent-2">2 ruang</span>
+        <span class="tag tag-neutral">1 kuota jam</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div style="display:grid;grid-template-columns:150px 1fr 300px;gap:24px;padding:18px 0;border-top:1px solid var(--color-text)">
+        <div>
+          <div style="font:600 12px/1.2 var(--font-heading);letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-2-700)">Guru ganda</div>
+          <div style="font-size:11.5px;opacity:.55;margin-top:5px">Selasa · JP 7–8</div>
+          <div style="font-size:11.5px;opacity:.55">12.30–14.00</div>
+        </div>
+        <div>
+          <div style="font:600 17px/1.3 var(--font-heading);margin-bottom:5px">Bagas Prakoso dijadwalkan di dua rombel sekaligus</div>
+          <div style="font-size:13px;opacity:.75;line-height:1.6">Projek Kreatif &amp; Kewirausahaan di <b>XI RPL 1</b> (Lab RPL 2) dan Produk Kreatif di <b>XI RPL 2</b> (Lab RPL 1). Kedua rombel membutuhkan blok 2 JP berurutan.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <button class="btn btn-primary" type="button" style="justify-content:flex-start">Pindahkan XI RPL 2 ke Rabu JP 7–8</button>
+          <button class="btn btn-secondary" type="button" style="justify-content:flex-start">Ganti pengampu ke Rian Nugroho</button>
+          <a class="btn btn-ghost" href="#1b" style="justify-content:flex-start">Buka di papan jadwal</a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:150px 1fr 300px;gap:24px;padding:18px 0;border-top:1px solid var(--color-divider)">
+        <div>
+          <div style="font:600 12px/1.2 var(--font-heading);letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-2-700)">Ruang ganda</div>
+          <div style="font-size:11.5px;opacity:.55;margin-top:5px">Kamis · JP 1–2</div>
+          <div style="font-size:11.5px;opacity:.55">07.00–08.30</div>
+        </div>
+        <div>
+          <div style="font:600 17px/1.3 var(--font-heading);margin-bottom:5px">Lab RPL 1 dipesan dua rombel</div>
+          <div style="font-size:13px;opacity:.75;line-height:1.6">Pemrograman Web <b>XI RPL 1</b> dan Pemrograman Dasar <b>X RPL 2</b>. Kapasitas lab 36 kursi, total permintaan 68 siswa.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <button class="btn btn-primary" type="button" style="justify-content:flex-start">Pindahkan X RPL 2 ke Lab RPL 2</button>
+          <button class="btn btn-secondary" type="button" style="justify-content:flex-start">Geser ke Kamis JP 4–5</button>
+          <a class="btn btn-ghost" href="#1b" style="justify-content:flex-start">Buka di papan jadwal</a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:150px 1fr 300px;gap:24px;padding:18px 0;border-top:1px solid var(--color-divider)">
+        <div>
+          <div style="font:600 12px/1.2 var(--font-heading);letter-spacing:.08em;text-transform:uppercase;opacity:.6">Kuota jam</div>
+          <div style="font-size:11.5px;opacity:.55;margin-top:5px">Sepanjang minggu</div>
+        </div>
+        <div>
+          <div style="font:600 17px/1.3 var(--font-heading);margin-bottom:5px">Retno Setyowati 32 JP dari kuota 30 JP</div>
+          <div style="font-size:13px;opacity:.75;line-height:1.6">Mengampu Matematika di 6 rombel dan Matematika Tingkat Lanjut di 2 rombel. Kelebihan 2 JP perlu dialihkan atau kuota dinaikkan dengan persetujuan kepala sekolah.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <button class="btn btn-primary" type="button" style="justify-content:flex-start">Alihkan 2 JP ke Hana Prameswari</button>
+          <button class="btn btn-secondary" type="button" style="justify-content:flex-start">Ajukan penambahan kuota</button>
+          <a class="btn btn-ghost" href="#1f" style="justify-content:flex-start">Lihat beban guru</a>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:150px 1fr 300px;gap:24px;padding:18px 0;border-top:1px solid var(--color-divider);opacity:.5">
+        <div>
+          <div style="font:600 12px/1.2 var(--font-heading);letter-spacing:.08em;text-transform:uppercase;opacity:.6">Ketersediaan</div>
+          <div style="font-size:11.5px;opacity:.55;margin-top:5px">Jumat · JP 1–2</div>
+        </div>
+        <div>
+          <div style="font:600 17px/1.3 var(--font-heading);margin-bottom:5px">Ayu Kartika dijadwalkan pada hari tidak tersedia</div>
+          <div style="font-size:13px;opacity:.75;line-height:1.6">Terdaftar tugas belajar setiap Jumat pagi.</div>
+        </div>
+        <div style="display:flex;align-items:flex-start"><span class="tag tag-neutral">3 bentrok lain di bawah</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1e">
+<div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Master data — alokasi JP kurikulum per mapel dan tingkat</div>
+<div class="dv-card" style="width:1000px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1a" style="color:inherit;text-decoration:none">Beranda</a>
+      <a href="#1b" style="color:inherit;text-decoration:none">Papan Jadwal</a>
+      <a href="#1d" style="color:inherit;text-decoration:none">Bentrok</a>
+      <a href="#1e" style="color:var(--color-accent);text-decoration:none;font-weight:600">Master Data</a>
+      <a href="#1f" style="color:inherit;text-decoration:none">Guru</a>
+    </nav>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:26px 30px 34px">
+    <div style="display:flex;gap:26px;font-size:13.5px;margin-bottom:22px">
+      <a href="#1e" style="text-decoration:none;color:var(--color-accent);font-weight:600;border-bottom:2px solid var(--color-accent);padding-bottom:5px">Mata pelajaran</a>
+      <a href="#1e" style="text-decoration:none;color:inherit;padding-bottom:5px">Rombel</a>
+      <a href="#1e" style="text-decoration:none;color:inherit;padding-bottom:5px">Ruang &amp; lab</a>
+      <a href="#1e" style="text-decoration:none;color:inherit;padding-bottom:5px">Jam pelajaran</a>
+      <a href="#1e" style="text-decoration:none;color:inherit;padding-bottom:5px">Kalender akademik</a>
+    </div>
+
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <h2 style="font-size:28px;margin:0 0 4px;letter-spacing:-.02em">Mata pelajaran &amp; alokasi JP</h2>
+        <p style="margin:0;font-size:13px;opacity:.6">32 mapel · struktur Kurikulum Merdeka SMK</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input class="input" type="search" placeholder="Cari mapel…" style="width:200px">
+        <button class="btn btn-primary" type="button">Tambah mapel</button>
+      </div>
+    </div>
+
+    <table class="table">
+      <thead><tr><th>Mata pelajaran</th><th>Kode</th><th>Kelompok</th><th>JP / minggu</th><th>Butuh ruang</th><th>Pengampu</th><th></th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600">Pendidikan Agama &amp; Budi Pekerti</td><td>PAI</td><td><span class="tag tag-neutral">Umum</span></td><td>3</td><td>Kelas biasa</td><td>Fauzi Rahman</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Matematika</td><td>MTK</td><td><span class="tag tag-neutral">Umum</span></td><td>4</td><td>Kelas biasa</td><td>Retno S. · Hana P.</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Bahasa Indonesia</td><td>BIN</td><td><span class="tag tag-neutral">Umum</span></td><td>3</td><td>Kelas biasa</td><td>Anwar Hidayat</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Projek IPAS</td><td>IPAS</td><td><span class="tag tag-neutral">Umum</span></td><td>2</td><td>Kelas biasa</td><td>Ayu Kartika</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Pemrograman Berorientasi Objek</td><td>PBO</td><td><span class="tag tag-accent">Konsentrasi</span></td><td>5</td><td><span style="color:var(--color-accent-700)">Lab RPL</span></td><td>Dwi Hartanto</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Basis Data</td><td>BD</td><td><span class="tag tag-accent">Konsentrasi</span></td><td>6</td><td><span style="color:var(--color-accent-700)">Lab RPL</span></td><td>Sinta Wulandari</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Projek Kreatif &amp; Kewirausahaan</td><td>PKK</td><td><span class="tag tag-accent">Konsentrasi</span></td><td>5</td><td><span style="color:var(--color-accent-700)">Lab RPL</span></td><td>Bagas Prakoso</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">PJOK</td><td>PJOK</td><td><span class="tag tag-neutral">Umum</span></td><td>2</td><td><span style="color:var(--color-accent-700)">Lapangan</span></td><td>Gilang Saputra</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+        <tr><td style="font-weight:600">Mapel Pilihan: Desain Grafis</td><td>PIL-DG</td><td><span class="tag tag-outline">Pilihan</span></td><td>2</td><td><span style="color:var(--color-accent-700)">Lab Multimedia</span></td><td>Rian Nugroho</td><td style="text-align:right"><button class="btn btn-ghost" type="button">Ubah</button></td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:center;font-size:12.5px;opacity:.55">
+      <span>Menampilkan 9 dari 32 mapel</span>
+      <span>Total alokasi kelas XI RPL: 48 JP / minggu</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1f">
+<div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Guru — ketersediaan mingguan dan beban jam dalam satu layar</div>
+<div class="dv-card" style="width:1000px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1a" style="color:inherit;text-decoration:none">Beranda</a>
+      <a href="#1b" style="color:inherit;text-decoration:none">Papan Jadwal</a>
+      <a href="#1d" style="color:inherit;text-decoration:none">Bentrok</a>
+      <a href="#1e" style="color:inherit;text-decoration:none">Master Data</a>
+      <a href="#1f" style="color:var(--color-accent);text-decoration:none;font-weight:600">Guru</a>
+    </nav>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:26px 30px 34px;display:grid;grid-template-columns:1fr 330px;gap:40px;align-items:start">
+    <div>
+      <h2 style="font-size:28px;margin:0 0 4px;letter-spacing:-.02em">Beban mengajar</h2>
+      <p style="margin:0 0 20px;font-size:13px;opacity:.6">45 guru · kuota standar 24–30 JP per minggu</p>
+      <table class="table">
+        <thead><tr><th>Guru</th><th>Mapel diampu</th><th>Rombel</th><th>JP</th><th style="width:120px">Kuota</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Retno Setyowati</td><td>Matematika, MTK Lanjut</td><td>8</td><td style="color:var(--color-accent-2-700);font-weight:600">32</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:100%;height:5px;background:var(--color-accent-2)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">lebih 2 JP</div></td></tr>
+          <tr><td style="font-weight:600">Dwi Hartanto</td><td>PBO, Pemrograman Web</td><td>6</td><td>27</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:90%;height:5px;background:var(--color-accent)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">dari 30 JP</div></td></tr>
+          <tr><td style="font-weight:600">Sinta Wulandari</td><td>Basis Data</td><td>4</td><td>24</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:80%;height:5px;background:var(--color-accent)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">dari 30 JP</div></td></tr>
+          <tr><td style="font-weight:600">Anwar Hidayat</td><td>Bahasa Indonesia</td><td>7</td><td>21</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:70%;height:5px;background:var(--color-accent)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">dari 30 JP</div></td></tr>
+          <tr><td style="font-weight:600">Bagas Prakoso</td><td>PKK, Produk Kreatif</td><td>5</td><td>21</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:70%;height:5px;background:var(--color-accent)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">dari 30 JP</div></td></tr>
+          <tr><td style="font-weight:600">Ayu Kartika</td><td>Projek IPAS</td><td>9</td><td>18</td><td><div style="height:5px;background:var(--color-neutral-200)"><div style="width:75%;height:5px;background:var(--color-accent)"></div></div><div style="font-size:10.5px;opacity:.5;margin-top:3px">dari 24 JP</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <aside>
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5;margin-bottom:6px">Detail guru</div>
+      <h3 style="font-size:22px;margin:0 0 2px;letter-spacing:-.02em">Retno Setyowati</h3>
+      <p style="font-size:12.5px;opacity:.6;margin:0 0 20px">NIP 19850412 · Matematika · sertifikasi aktif</p>
+
+      <h6 style="margin:0 0 8px">Ketersediaan mingguan</h6>
+      <p style="font-size:11.5px;opacity:.55;margin:0 0 10px">Klik sel untuk menandai jam tidak tersedia</p>
+      <div style="display:grid;grid-template-columns:44px repeat(6,1fr);gap:2px;font-size:9.5px">
+        <div></div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Sen</div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Sel</div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Rab</div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Kam</div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Jum</div>
+        <div style="text-align:center;opacity:.5;padding-bottom:3px">Sab</div>
+
+        <div style="opacity:.5;line-height:20px">JP 1</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-accent-200)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 2</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-accent-200)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 3</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 4</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 5</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 6</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-neutral-300)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 7</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-neutral-300)"></div>
+
+        <div style="opacity:.5;line-height:20px">JP 8</div>
+        <div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-accent-200)"></div><div style="height:20px;background:var(--color-neutral-300)"></div><div style="height:20px;background:var(--color-neutral-300)"></div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:10px;font-size:11px">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;background:var(--color-accent-200)"></span>Tersedia</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:11px;height:11px;background:var(--color-neutral-300)"></span>Tidak tersedia</span>
+      </div>
+
+      <div style="margin-top:24px">
+        <h6 style="margin:0 0 8px">Preferensi</h6>
+        <div style="font-size:12.5px;line-height:1.7;opacity:.8">
+          <div>Maksimal 6 JP per hari</div>
+          <div>Tidak mengajar dua rombel berurutan di gedung berbeda</div>
+          <div>Prioritas jam pagi untuk Matematika</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" type="button" style="margin-top:22px">Simpan perubahan</button>
+    </aside>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1g">
+<div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Jadwal guru — tampilan sendiri, ajukan tukar jam dari sel</div>
+<div class="dv-card" style="width:940px">
+  <div style="padding:16px 30px 12px;display:flex;align-items:baseline;gap:22px">
+    <div style="font:600 19px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+    <nav style="display:flex;gap:20px;font-size:13.5px;margin-left:6px">
+      <a href="#1g" style="color:var(--color-accent);text-decoration:none;font-weight:600">Jadwal Saya</a>
+      <a href="#1g" style="color:inherit;text-decoration:none">Ketersediaan</a>
+      <a href="#1g" style="color:inherit;text-decoration:none">Permintaan Tukar</a>
+    </nav>
+    <div style="margin-left:auto;font-size:12px;opacity:.6">Dwi Hartanto · Guru RPL</div>
+  </div>
+  <div style="height:3px;background:var(--color-text);margin:0 30px"></div>
+  <div style="height:1px;background:var(--color-text);margin:2px 30px 0"></div>
+
+  <div style="padding:26px 30px 34px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px">
+      <div>
+        <h2 style="font-size:28px;margin:0 0 4px;letter-spacing:-.02em">Minggu ini</h2>
+        <p style="margin:0;font-size:13px;opacity:.6">27 JP · 6 rombel · 13–18 Juli 2026</p>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" type="button">Unduh PDF</button>
+        <button class="btn btn-secondary" type="button">Tambahkan ke kalender</button>
+      </div>
+    </div>
+
+    <sc-if value="{{ tampilkanBentrok }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-bottom:18px;padding:11px 16px;background:var(--color-accent-100);display:flex;align-items:center;gap:14px">
+        <span style="font:600 13.5px/1.3 var(--font-heading);color:var(--color-accent-800)">Perubahan jadwal Senin</span>
+        <span style="font-size:12.5px;color:var(--color-accent-800);opacity:.85">Pemrograman Web XI RPL 1 pindah dari Kamis JP 1–2 ke Kamis JP 4–5 oleh Waka Kurikulum</span>
+        <button class="btn btn-ghost" type="button" style="margin-left:auto">Mengerti</button>
+      </div>
+    </sc-if>
+
+    <table class="table tt" style="table-layout:fixed">
+      <thead><tr><th style="width:70px">Jam</th><th>Senin</th><th>Selasa</th><th>Rabu</th><th>Kamis</th><th>Jumat</th><th>Sabtu</th></tr></thead>
+      <tbody>
+        <tr>
+          <td style="font-size:11px;opacity:.55">JP 1–2</td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">PBO</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">X RPL 2 · Lab RPL 1</div></td>
+          <td></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">Pemrograman Web</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XII RPL 1 · Lab RPL 1</div></td>
+          <td></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">PBO</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XI RPL 2 · Lab RPL 1</div></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55">JP 3</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55">JP 4–5</td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">PBO</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XI RPL 1 · Lab RPL 1</div></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">PBO <span style="font-weight:400;opacity:.5">(3 JP)</span></div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XI RPL 1 · Lab RPL 1</div></td>
+          <td></td>
+          <td style="background:var(--color-accent-100);box-shadow:inset 2px 0 0 var(--color-accent)"><div style="font:600 12.5px/1.25 var(--font-heading)">Pemrograman Web</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XI RPL 1 · Lab RPL 1</div><div style="margin-top:5px"><span class="tag tag-accent" style="font-size:9.5px;padding:2px 6px">Baru dipindah</span></div></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55">JP 6</td>
+          <td></td>
+          <td></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">Informatika</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">X TKJ 1 · R. 4</div></td>
+          <td></td>
+          <td style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)"></td>
+          <td style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)"></td>
+        </tr>
+        <tr>
+          <td style="font-size:11px;opacity:.55">JP 7–8</td>
+          <td></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">Pemrograman Web</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XII RPL 2 · Lab RPL 1</div></td>
+          <td style="background:var(--color-accent-100)"><div style="font:600 12.5px/1.25 var(--font-heading)">PBO</div><div style="font-size:10.5px;opacity:.55;margin-top:2px">XII RPL 1 · Lab RPL 1</div></td>
+          <td></td>
+          <td style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)"></td>
+          <td style="background:repeating-linear-gradient(135deg,transparent,transparent 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 5px,color-mix(in srgb,var(--color-text) 7%,transparent) 10px)"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:36px">
+      <div>
+        <h6 style="margin:0 0 10px">Ajukan tukar jam</h6>
+        <p style="font-size:12.5px;opacity:.7;line-height:1.6;margin:0 0 12px">Pilih satu jam mengajar, sistem menampilkan guru yang bebas di jam itu dan mengampu mapel serumpun. Permintaan masuk ke Waka Kurikulum untuk disetujui.</p>
+        <button class="btn btn-secondary" type="button">Pilih jam untuk ditukar</button>
+      </div>
+      <div>
+        <h6 style="margin:0 0 10px">Permintaan berjalan</h6>
+        <div style="display:flex;flex-direction:column;gap:11px;font-size:12.5px">
+          <div style="display:flex;justify-content:space-between;gap:12px"><span>Rabu JP 7–8 → Rian Nugroho</span><span class="tag tag-neutral">Menunggu</span></div>
+          <div style="display:flex;justify-content:space-between;gap:12px"><span>Selasa JP 1–2 → Sinta Wulandari</span><span class="tag tag-accent">Disetujui</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1h">
+<div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Jadwal siswa — mobile, hari ini dulu lalu minggu penuh</div>
+<div style="display:flex;gap:22px">
+  <div class="dv-card" style="width:390px">
+    <div style="padding:18px 20px 14px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div style="font:600 17px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+        <div style="font-size:11.5px;opacity:.55">XI RPL 1</div>
+      </div>
+    </div>
+    <div style="height:3px;background:var(--color-text);margin:0 20px"></div>
+    <div style="height:1px;background:var(--color-text);margin:2px 20px 0"></div>
+
+    <div style="padding:20px 20px 26px">
+      <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.5">Selasa, 14 Juli</div>
+      <h2 style="font-size:30px;margin:4px 0 3px;letter-spacing:-.025em">Hari ini</h2>
+      <p style="margin:0 0 20px;font-size:12.5px;opacity:.6">8 JP · berakhir 14.00</p>
+
+      <div style="padding:12px 14px;background:var(--color-accent-100);margin-bottom:20px">
+        <div style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent-800);opacity:.8">Sedang berlangsung</div>
+        <div style="font:600 17px/1.25 var(--font-heading);margin-top:4px">Pemrograman Berorientasi Objek</div>
+        <div style="font-size:12px;opacity:.65;margin-top:3px">Dwi Hartanto · Lab RPL 1</div>
+        <div style="font-size:12px;opacity:.65">09.30–11.45 · sisa 42 menit</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0">
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--color-divider);opacity:.45">
+          <div style="font-size:11.5px;line-height:1.4">07.00<br><span style="opacity:.7">JP 1–2</span></div>
+          <div><div style="font:600 14px/1.25 var(--font-heading)">Bahasa Indonesia</div><div style="font-size:11.5px;opacity:.65;margin-top:2px">Anwar Hidayat · R. 11</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--color-divider);opacity:.45">
+          <div style="font-size:11.5px;line-height:1.4">08.30<br><span style="opacity:.7">JP 3</span></div>
+          <div><div style="font:600 14px/1.25 var(--font-heading)">PPKn</div><div style="font-size:11.5px;opacity:.65;margin-top:2px">Yuni Astari · R. 11</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--color-divider);background:var(--color-accent-100);box-shadow:inset 2px 0 0 var(--color-accent)">
+          <div style="font-size:11.5px;line-height:1.4;padding-left:8px">09.30<br><span style="opacity:.7">JP 4–6</span></div>
+          <div><div style="font:600 14px/1.25 var(--font-heading)">Pemrograman Berorientasi Objek</div><div style="font-size:11.5px;opacity:.65;margin-top:2px">Dwi Hartanto · Lab RPL 1</div><div style="margin-top:6px"><span class="tag tag-accent" style="font-size:9.5px;padding:2px 6px">Bawa laptop</span></div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--color-divider)">
+          <div style="font-size:11.5px;line-height:1.4">11.45<br><span style="opacity:.7">ISHOMA</span></div>
+          <div style="font-size:13px;opacity:.5;align-self:center">Istirahat, sholat, makan</div>
+        </div>
+        <div style="display:grid;grid-template-columns:52px 1fr;gap:14px;padding:11px 0;border-top:1px solid var(--color-divider)">
+          <div style="font-size:11.5px;line-height:1.4">12.30<br><span style="opacity:.7">JP 7–8</span></div>
+          <div><div style="font:600 14px/1.25 var(--font-heading)">Projek Kreatif &amp; Kewirausahaan</div><div style="font-size:11.5px;opacity:.65;margin-top:2px">Bagas Prakoso · Lab RPL 2</div></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:24px;margin-top:22px;padding-top:16px;border-top:1px solid var(--color-text);font-size:12.5px">
+        <a href="#1h" style="color:var(--color-accent);text-decoration:none;font-weight:600">Hari ini</a>
+        <a href="#1h" style="color:inherit;text-decoration:none">Minggu ini</a>
+        <a href="#1h" style="color:inherit;text-decoration:none">Guru</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="dv-card" style="width:390px">
+    <div style="padding:18px 20px 14px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <div style="font:600 17px/1 var(--font-heading);letter-spacing:-.02em">Jadwal<span style="color:var(--color-accent)">·</span>SMKN 4</div>
+        <div style="font-size:11.5px;opacity:.55">XI RPL 1</div>
+      </div>
+    </div>
+    <div style="height:3px;background:var(--color-text);margin:0 20px"></div>
+    <div style="height:1px;background:var(--color-text);margin:2px 20px 0"></div>
+
+    <div style="padding:20px 20px 26px">
+      <h2 style="font-size:28px;margin:0 0 3px;letter-spacing:-.025em">Minggu ini</h2>
+      <p style="margin:0 0 18px;font-size:12.5px;opacity:.6">13–18 Juli 2026 · 48 JP</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading)">Senin</span><span style="font-size:11px;opacity:.5">13 Juli · 8 JP</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-neutral">Upacara</span><span class="tag tag-neutral">Matematika</span><span class="tag tag-accent">PBO</span><span class="tag tag-neutral">B. Inggris</span><span class="tag tag-accent">Basis Data</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading);color:var(--color-accent-700)">Selasa</span><span style="font-size:11px;opacity:.5">14 Juli · hari ini</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-neutral">B. Indonesia</span><span class="tag tag-neutral">PPKn</span><span class="tag tag-accent">PBO</span><span class="tag tag-accent">PKK</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading)">Rabu</span><span style="font-size:11px;opacity:.5">15 Juli · 6 JP</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-neutral">Matematika</span><span class="tag tag-neutral">PJOK</span><span class="tag tag-accent">Basis Data</span><span class="tag tag-neutral">Sejarah</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading)">Kamis</span><span style="font-size:11px;opacity:.5">16 Juli · 8 JP</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-accent">Pemrograman Web</span><span class="tag tag-neutral">B. Inggris</span><span class="tag tag-neutral">MTK Lanjut</span><span class="tag tag-neutral">Seni Budaya</span><span class="tag tag-neutral">PAI</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading)">Jumat</span><span style="font-size:11px;opacity:.5">17 Juli · 5 JP</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-neutral">Projek IPAS</span><span class="tag tag-neutral">B. Indonesia</span><span class="tag tag-accent">Basis Data</span>
+          </div>
+        </div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px"><span style="font:600 14px var(--font-heading)">Sabtu</span><span style="font-size:11px;opacity:.5">18 Juli · 6 JP</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            <span class="tag tag-accent">PKK</span><span class="tag tag-neutral">BK</span><span class="tag tag-accent">Desain Grafis</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:24px;margin-top:24px;padding-top:16px;border-top:1px solid var(--color-text);font-size:12.5px">
+        <a href="#1h" style="color:inherit;text-decoration:none">Hari ini</a>
+        <a href="#1h" style="color:var(--color-accent);text-decoration:none;font-weight:600">Minggu ini</a>
+        <a href="#1h" style="color:inherit;text-decoration:none">Guru</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<sc-if value="{{ tampilkanAnotasi }}" hint-placeholder-val="{{ true }}">
+<div class="dv-opt" id="1i">
+<div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>Blueprint — peta layar, entitas data, aturan validasi</div>
+<div class="dv-card" style="width:1320px">
+  <div style="padding:30px 34px 36px">
+    <h2 style="font-size:30px;margin:0 0 26px;letter-spacing:-.02em">Blueprint untuk tim backend</h2>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px">
+      <div>
+        <h6 style="margin:0 0 12px">Peta layar &amp; hak akses</h6>
+        <table class="table" style="margin-bottom:34px">
+          <thead><tr><th>Layar</th><th>Rute</th><th>Admin</th><th>Guru</th><th>Siswa</th></tr></thead>
+          <tbody>
+            <tr><td><a href="#1a">Beranda admin</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/dashboard</td><td>Penuh</td><td>—</td><td>—</td></tr>
+            <tr><td><a href="#1b">Papan jadwal</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/jadwal/:rombelId</td><td>Ubah</td><td>Lihat</td><td>—</td></tr>
+            <tr><td><a href="#1c">Generate otomatis</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/jadwal/generate</td><td>Penuh</td><td>—</td><td>—</td></tr>
+            <tr><td><a href="#1d">Pusat bentrok</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/bentrok</td><td>Penuh</td><td>Lihat miliknya</td><td>—</td></tr>
+            <tr><td><a href="#1e">Master data</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/master/*</td><td>Penuh</td><td>—</td><td>—</td></tr>
+            <tr><td><a href="#1f">Guru &amp; ketersediaan</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/guru/:id</td><td>Ubah</td><td>Ubah miliknya</td><td>—</td></tr>
+            <tr><td><a href="#1g">Jadwal guru</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/saya/jadwal</td><td>Lihat</td><td>Penuh</td><td>—</td></tr>
+            <tr><td><a href="#1h">Jadwal siswa</a></td><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">/siswa/jadwal</td><td>Lihat</td><td>—</td><td>Lihat</td></tr>
+          </tbody>
+        </table>
+
+        <h6 style="margin:0 0 12px">Aturan validasi yang tampil di UI</h6>
+        <table class="table">
+          <thead><tr><th>Kode</th><th>Aturan</th><th>Jenis</th><th>Tampil di</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">C01</td><td>Guru tidak boleh di dua slot yang sama</td><td><span class="tag tag-accent-2">Keras</span></td><td>Sel papan + pusat bentrok</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">C02</td><td>Ruang tidak boleh dipakai dua rombel</td><td><span class="tag tag-accent-2">Keras</span></td><td>Sel papan + pusat bentrok</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">C03</td><td>Mapel praktik butuh tipe ruang cocok</td><td><span class="tag tag-accent-2">Keras</span></td><td>Saat tarik-lepas</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">C04</td><td>Slot di luar jam sekolah terkunci</td><td><span class="tag tag-accent-2">Keras</span></td><td>Sel diarsir</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">C05</td><td>Ketersediaan guru dihormati</td><td><span class="tag tag-accent-2">Keras</span></td><td>Pusat bentrok</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">S01</td><td>JP guru tidak melebihi kuota</td><td><span class="tag tag-neutral">Lunak</span></td><td>Panel beban + beranda</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">S02</td><td>Mapel berat diutamakan pagi</td><td><span class="tag tag-neutral">Lunak</span></td><td>Skor generate</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">S03</td><td>Blok praktik berurutan minimal 3 JP</td><td><span class="tag tag-neutral">Lunak</span></td><td>Skor generate</td></tr>
+            <tr><td style="font-family:ui-monospace,Menlo,monospace;font-size:12px">S04</td><td>Hindari jam kosong di tengah hari guru</td><td><span class="tag tag-neutral">Lunak</span></td><td>Skor generate</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h6 style="margin:0 0 12px">Entitas yang dipakai layar-layar ini</h6>
+        <div style="display:flex;flex-direction:column;gap:18px;font-size:13px;line-height:1.6">
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">TahunAjaran</div>
+            <div style="opacity:.7">id · tahun · semester · tanggalMulai · tanggalSelesai · statusKunci</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">Rombel</div>
+            <div style="opacity:.7">id · nama · tingkat · jurusan · jumlahSiswa · waliKelasId · ruangDefaultId</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">MataPelajaran</div>
+            <div style="opacity:.7">id · nama · kode · kelompok · jpPerMinggu · tipeRuangDibutuhkan · minBlokJP</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">Guru</div>
+            <div style="opacity:.7">id · nama · nip · kuotaJP · mapelDiampu[] · preferensi</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">KetersediaanGuru</div>
+            <div style="opacity:.7">guruId · hari · jpKe · tersedia · alasan</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">Ruang</div>
+            <div style="opacity:.7">id · nama · tipe · kapasitas · gedung</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">SlotJam</div>
+            <div style="opacity:.7">id · hari · jpKe · jamMulai · jamSelesai · jenis (belajar / istirahat / ishoma)</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent-2);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">JadwalItem <span style="font-size:11px;font-weight:400;opacity:.6">— tabel inti</span></div>
+            <div style="opacity:.7">id · tahunAjaranId · rombelId · mapelId · guruId · ruangId · slotJamId · durasiJP · sumber (manual / generate) · statusKunci</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent-2);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">Bentrok</div>
+            <div style="opacity:.7">id · kode (C01…S04) · tingkat (keras / lunak) · jadwalItemIds[] · usulanPerbaikan[] · statusSelesai</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">PermintaanTukar</div>
+            <div style="opacity:.7">id · pemohonGuruId · jadwalItemId · guruTujuanId · alasan · status · disetujuiOleh</div>
+          </div>
+          <div style="border-left:2px solid var(--color-accent);padding-left:14px">
+            <div style="font:600 15px/1.3 var(--font-heading);margin-bottom:3px">RiwayatPerubahan</div>
+            <div style="opacity:.7">id · jadwalItemId · nilaiSebelum · nilaiSesudah · olehUserId · waktu</div>
+          </div>
+        </div>
+
+        <h6 style="margin:28px 0 12px">Catatan implementasi</h6>
+        <div style="font-size:13px;line-height:1.7;opacity:.8">
+          <p style="margin:0 0 10px">Deteksi bentrok sebaiknya dijalankan di server setelah setiap penyimpanan dan hasilnya disimpan di tabel <b>Bentrok</b>, bukan dihitung ulang di klien. UI di <a href="#1b">1b</a> dan <a href="#1d">1d</a> membaca tabel yang sama, jadi angkanya tidak pernah berbeda.</p>
+          <p style="margin:0 0 10px">Papan jadwal memakai pembaruan optimistis: sel berubah langsung saat dilepas, lalu diperbaiki jika server menolak. Tanpa ini, tarik-lepas terasa lambat pada 48 slot.</p>
+          <p style="margin:0">Mesin generate mengembalikan beberapa usulan sebagai draf terpisah, tidak menimpa jadwal berjalan. Admin menerapkannya secara eksplisit dari <a href="#1c">1c</a>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</sc-if>
+
+</div>
+<p class="dv-next">Coba lanjut: "papan jadwal <a class="dv-oid" href="#1b">1b</a> versi per guru, bukan per rombel" · "tambah layar login &amp; pengaturan tahun ajaran" · "buat <a class="dv-oid" href="#1c">1c</a> jadi wizard 3 langkah" · "versi mobile untuk guru"</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;tampilkanBentrok&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tampilan&quot;},&quot;tampilkanAnotasi&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tampilan&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tampilkanAnotasi: this.props.tampilkanAnotasi ?? true,
+      tampilkanBentrok: this.props.tampilkanBentrok ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>
