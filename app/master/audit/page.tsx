@@ -1,6 +1,9 @@
 import { getAuditLogs } from "@/app/actions/handoverActions";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AuditHistoryPage() {
   const logs = await getAuditLogs();
 

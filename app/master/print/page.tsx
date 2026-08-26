@@ -1,6 +1,9 @@
 import { prisma } from "@/app/lib/prisma";
 import SchedulePrintView from "@/app/components/SchedulePrintView";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function PrintSchedulePage() {
   const activeYear = await prisma.academicYear.findFirst({
     where: { isActive: true },

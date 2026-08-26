@@ -42,6 +42,37 @@ export async function toggleTeacherStatus(id: string, currentStatus: string) {
   revalidatePath("/master/teachers");
 }
 
+export async function deleteTeacher(id: string) {
+  const teacher = await prisma.teacher.findUnique({ where: { id } });
+  if (!teacher) return;
+
+  // Hapus relasi jadwal, beban mengajar, batasan waktu, lalu hapus guru secara atomik
+  await prisma.$transaction([
+    prisma.schedule.deleteMany({ where: { teacherId: id } }),
+    prisma.teachingLoad.deleteMany({ where: { teacherId: id } }),
+    prisma.teacherConstraint.deleteMany({ where: { teacherId: id } }),
+    prisma.teacher.delete({ where: { id } }),
+    prisma.auditLog.create({
+      data: {
+        action: "DELETE_TEACHER",
+        details: {
+          deletedTeacherId: id,
+          deletedTeacherName: teacher.name,
+          timestamp: new Date().toISOString(),
+        },
+        performedBy: "Administrator",
+      },
+    }),
+  ]);
+
+  revalidatePath("/master/teachers");
+  revalidatePath("/master/teaching-load");
+  revalidatePath("/master/classes");
+  revalidatePath("/master/conflicts");
+  revalidatePath("/master/print");
+  revalidatePath("/");
+}
+
 // =======================
 // SUBJECT ACTIONS
 // =======================
