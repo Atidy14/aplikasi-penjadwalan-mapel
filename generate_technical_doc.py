@@ -433,7 +433,7 @@ def create_technical_doc():
         p_ds.add_run(ds_desc)
 
     # Simpan File Dokumen Teknis DOCX
-    output_filename = "DOKUMEN_TEKNIS_SISTEM_SIP_MAPEL_AGILE_v2.0.docx"
+    output_filename = "DOKUMEN_TEKNIS_SISTEM_SIP_MAPEL_AGILE_v2.1.docx"
     doc.save(output_filename)
     print(f"[SUCCESS] Dokumen Teknis Agile berhasil dibuat: {output_filename}")
 

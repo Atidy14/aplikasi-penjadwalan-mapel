@@ -302,11 +302,12 @@ def create_manual_book():
     add_chapter_header(4, "Pengelolaan Data Master")
     p = doc.add_paragraph("Data Master merupakan pondasi awal sebelum sistem dapat menyusun jadwal. Data Master terdiri dari Manajemen Guru, Mata Pelajaran, dan Struktur Rombel Kelas.")
 
-    add_section_header("4.1 Manajemen Data Guru")
-    p = doc.add_paragraph("Diakses melalui menu 'Guru' (`/master/teachers`). Administrator dapat menambahkan nama guru, mengubah status aktif/nonaktif, mengatur jam libur khusus, serta melakukan serah terima jadwal mengajar.")
-    add_image_if_exists("02_data_guru.png", "Halaman Manajemen Data Guru dan Status")
+    add_section_header("4.1 Manajemen Data Guru & Fitur Hapus")
+    p = doc.add_paragraph("Diakses melalui menu 'Guru & Izin' (`/master/teachers`). Administrator dapat menambahkan nama guru baru, mengubah status aktif/nonaktif, mengatur batasan jam libur/izin, melakukan serah terima jadwal mengajar, serta menghapus data guru secara permanen.")
+    add_image_if_exists("02_data_guru.png", "Halaman Manajemen Data Guru, Tombol Hapus & Hanging Tooltips")
 
-    add_callout("Guru yang dinonaktifkan (Status: Nonaktif) tidak akan muncul pada pilihan pembuatan Kertas Kerja baru, namun rekam jejak historis mengajarnya tetap tersimpan aman di database.", "NOTE")
+    add_callout("Tombol Hapus Guru dilengkapi dialog konfirmasi keamanan: jika guru yang dihapus sedang memiliki penugasan di Kertas Kerja atau jadwal aktif, sistem akan secara atomik membersihkan data terkait agar tidak terjadi orphan record di database.", "WARNING")
+    add_callout("Seluruh tombol operasional pada modul Guru, Mapel, Kelas, dan Kertas Kerja telah dilengkapi fitur 'Hanging Popups' (penjelasan mengambang interaktif saat kursor diarahkan ke tombol).", "SUCCESS")
 
     add_section_header("4.2 Manajemen Mata Pelajaran")
     p = doc.add_paragraph("Diakses melalui menu 'Mata Pelajaran' (`/master/subjects`). Setiap mata pelajaran wajib memiliki parameter 'Target Jam Pelajaran per Minggu' (misal: Matematika 4 jam, Fisika 3 jam, dsb). Nilai ini akan menjadi acuan utama bagi validator dan algoritma penjadwalan.")
@@ -544,7 +545,7 @@ def create_manual_book():
     add_callout("Administrator atau Auditor Eksternal dapat menjalankan verifikasi sistem sewaktu-waktu dengan menjalankan perintah: `npm test` di terminal.", "SUCCESS")
 
     # Simpan File Dokumen DOCX
-    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.3_ENTERPRISE.docx"
+    output_filename = "MANUAL_BOOK_SIP_MAPEL_v2.4_ENTERPRISE.docx"
     doc.save(output_filename)
     print(f"[SUCCESS] Dokumen Manual Book berhasil dibuat: {output_filename}")
 
